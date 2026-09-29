@@ -5,10 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node ./node_modules/vite/bin/vite.js --host --port 5173",
+    "dev": "node ./node_modules/vite/bin/vite.js --host 0.0.0.0 --port 5173",
     "build": "node ./node_modules/vite/bin/vite.js build",
-    "preview": "node ./node_modules/vite/bin/vite.js preview --host",
-    "start": "node ./node_modules/vite/bin/vite.js preview --host"
+    "preview": "node ./node_modules/vite/bin/vite.js preview",
+    "start": "node server.js"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",
