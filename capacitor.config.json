@@ -1,6 +1,6 @@
 {
   "appId": "com.nexus3d.cyberarcade",
-  "appName": "Nexus 3D Cyber Arcade",
+  "appName": "Nexus 3D",
   "webDir": "dist",
   "bundledWebRuntime": false,
   "server": {

@@ -10,6 +10,7 @@ export class CyberPong3DGame {
     this.playerScore = 0;
     this.aiScore = 0;
     this.isRunning = false;
+    this.isPaused = false;
 
     this.tableWidth = 10;
     this.tableLength = 16;
@@ -18,8 +19,8 @@ export class CyberPong3DGame {
 
   init() {
     this.container.innerHTML = '';
-    const width = this.container.clientWidth || 800;
-    const height = this.container.clientHeight || 500;
+    const width = Math.max(300, this.container.clientWidth || 800);
+    const height = Math.max(200, this.container.clientHeight || 500);
 
     this.scene = new THREE.Scene();
     this.scene.fog = new THREE.FogExp2(0x060914, 0.03);
@@ -91,14 +92,21 @@ export class CyberPong3DGame {
     this.container.addEventListener('touchmove', this.boundMouseMove);
 
     this.boundResize = () => {
-      if (!this.container || !this.renderer) return;
+      if (!this.container || !this.renderer || !this.camera) return;
       const w = this.container.clientWidth;
       const h = this.container.clientHeight;
-      this.camera.aspect = w / h;
-      this.camera.updateProjectionMatrix();
-      this.renderer.setSize(w, h);
+      if (w > 0 && h > 0) {
+        this.camera.aspect = w / h;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(w, h);
+      }
     };
     window.addEventListener('resize', this.boundResize);
+
+    if (window.ResizeObserver) {
+      this.resizeObserver = new ResizeObserver(() => this.boundResize());
+      this.resizeObserver.observe(this.container);
+    }
 
     this.isRunning = true;
     this.animate();
@@ -180,8 +188,17 @@ export class CyberPong3DGame {
   animate() {
     if (!this.isRunning) return;
     this.animId = requestAnimationFrame(this.animate.bind(this));
+    if (this.isPaused) return;
     this.update();
     this.renderer.render(this.scene, this.camera);
+  }
+
+  pause() {
+    this.isPaused = true;
+  }
+
+  resume() {
+    this.isPaused = false;
   }
 
   destroy() {
@@ -190,6 +207,9 @@ export class CyberPong3DGame {
     this.container.removeEventListener('mousemove', this.boundMouseMove);
     this.container.removeEventListener('touchmove', this.boundMouseMove);
     window.removeEventListener('resize', this.boundResize);
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
     if (this.renderer && this.renderer.domElement) {
       this.renderer.domElement.remove();
     }

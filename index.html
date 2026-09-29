@@ -148,34 +148,131 @@
 
   <!-- ================= COMPACT 3D GAME ARENA MODAL ================= -->
   <div class="modal-overlay hidden" id="game-modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-title" id="modal-game-title">Cyber Runner 3D</div>
-        <button class="btn-close" id="close-game-modal-btn">&times;</button>
+    <div class="modal-content game-modal-content">
+      <!-- Game Modal Header -->
+      <div class="game-modal-header">
+        <div class="game-header-info">
+          <span class="game-header-badge" id="modal-game-badge">3D ACTION</span>
+          <h3 class="game-header-title" id="modal-game-title">Cyber Runner 3D</h3>
+        </div>
+        <div class="game-header-actions">
+          <button class="btn-game-tool" id="game-audio-tool-btn" title="Toggle Audio (M)">🎵 Sound</button>
+          <button class="btn-game-tool" id="game-fullscreen-tool-btn" title="Fullscreen (F)">⛶ Maximize</button>
+          <button class="btn-game-tool btn-game-close" id="close-game-modal-btn" title="Close Arena (Esc)">&times;</button>
+        </div>
       </div>
 
-      <div class="game-arena-wrapper">
+      <!-- Centered 3D Game Arena Stage -->
+      <div class="game-arena-wrapper" id="game-arena-wrapper">
         <div id="game-canvas-container" class="game-canvas-container"></div>
 
-        <!-- In-Game Minimal HUD -->
+        <!-- In-Game High-Tech Cyber HUD Bar -->
         <div class="game-hud-overlay">
-          <div class="hud-stat-chip">SCORE: <span id="hud-score-val" style="color: var(--neon-blue)">0</span></div>
-          <div class="hud-stat-chip">REWARD: <span id="hud-sub-val" style="color: var(--accent-gold)">0</span></div>
+          <div class="hud-left-stats">
+            <div class="hud-chip hud-chip-cyan">
+              <span class="hud-label">SCORE</span>
+              <span class="hud-value" id="hud-score-val">0</span>
+            </div>
+            <div class="hud-chip hud-chip-purple">
+              <span class="hud-label">BEST</span>
+              <span class="hud-value" id="hud-best-val">0</span>
+            </div>
+          </div>
+
+          <div class="hud-center-stats">
+            <div class="hud-chip hud-chip-gold">
+              <span class="hud-label" id="hud-sub-label">REWARD</span>
+              <span class="hud-value" id="hud-sub-val">0 🪙</span>
+            </div>
+          </div>
+
+          <div class="hud-right-stats">
+            <button class="hud-icon-btn" id="hud-pause-btn" title="Pause Game (P)">
+              ⏸️
+            </button>
+          </div>
         </div>
 
-        <!-- Touch Controls for Phone -->
+        <!-- Ergonomic Mobile Touch Controls (Hidden on Desktop) -->
         <div class="touch-controls-bar" id="touch-controls-bar">
-          <button class="touch-btn" id="touch-left-btn">◀</button>
-          <button class="touch-btn" id="touch-action-btn">▲</button>
-          <button class="touch-btn" id="touch-right-btn">▶</button>
+          <div class="touch-cluster-left">
+            <button class="touch-btn touch-btn-dir" id="touch-left-btn" aria-label="Steer Left">◀</button>
+            <button class="touch-btn touch-btn-dir" id="touch-right-btn" aria-label="Steer Right">▶</button>
+          </div>
+          <div class="touch-cluster-right">
+            <button class="touch-btn touch-btn-action" id="touch-action-btn" aria-label="Action / Fire / Jump">⚡ ACTION</button>
+          </div>
+        </div>
+
+        <!-- In-Game Pause Overlay -->
+        <div class="game-state-overlay hidden" id="game-pause-overlay">
+          <div class="game-state-card">
+            <div class="game-state-icon">⏸️</div>
+            <h3 class="game-state-title">SYSTEM PAUSED</h3>
+            <p class="game-state-subtitle" id="pause-game-name">Cyber Runner 3D</p>
+            <div class="game-state-buttons">
+              <button class="btn-state-action btn-state-primary" id="pause-resume-btn">
+                ▶ Resume Game (Space)
+              </button>
+              <button class="btn-state-action" id="pause-restart-btn">
+                🔄 Restart Game
+              </button>
+              <button class="btn-state-action btn-state-exit" id="pause-exit-btn">
+                🚪 Exit to Lobby
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- In-Game Mission Complete / Game Over Overlay -->
+        <div class="game-state-overlay hidden" id="game-over-overlay">
+          <div class="game-state-card">
+            <div class="game-state-badge" id="game-over-badge">MISSION COMPLETE</div>
+            <h3 class="game-state-title" id="game-over-title">CYBER RUNNER 3D</h3>
+            
+            <div class="game-stats-grid">
+              <div class="stat-box">
+                <span class="stat-label">FINAL SCORE</span>
+                <span class="stat-val stat-neon-cyan" id="game-over-score">0</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">COINS EARNED</span>
+                <span class="stat-val stat-neon-gold" id="game-over-coins">+0 🪙</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">BEST RECORD</span>
+                <span class="stat-val stat-neon-purple" id="game-over-best">0</span>
+              </div>
+            </div>
+
+            <div class="new-record-alert hidden" id="new-record-alert">
+              🏆 NEW HIGH SCORE RECORD!
+            </div>
+
+            <div class="game-state-buttons">
+              <button class="btn-state-action btn-state-primary" id="gameover-restart-btn">
+                ⚡ Play Again (Space)
+              </button>
+              <button class="btn-state-action btn-state-exit" id="gameover-exit-btn">
+                🚪 Return to Lobby
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
+      <!-- Game Modal Footer -->
       <div class="game-modal-footer">
-        <div id="game-controls-hint">Controls: Left/Right to Steer, Space to Jump/Fire</div>
-        <div style="display: flex; gap: 0.5rem;">
-          <button class="btn-play-card" id="game-restart-btn">🔄 Restart</button>
-          <button class="btn-reward-compact" id="game-exit-btn">Exit</button>
+        <div class="game-keyboard-legend" id="game-controls-hint">
+          <span class="kbd-badge">◀</span> <span class="kbd-badge">▶</span> Steer
+          <span class="kbd-sep">•</span>
+          <span class="kbd-badge">SPACE</span> Fire / Jump
+          <span class="kbd-sep">•</span>
+          <span class="kbd-badge">P</span> Pause
+        </div>
+        <div class="game-footer-actions">
+          <button class="btn-game-footer" id="game-restart-btn">🔄 Restart</button>
+          <button class="btn-game-footer btn-game-exit" id="game-exit-btn">🚪 Exit</button>
         </div>
       </div>
     </div>

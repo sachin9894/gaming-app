@@ -25,14 +25,15 @@ export class CyberRunner3DGame {
     this.obstacles = [];
     this.collectibles = [];
     this.particles = [];
+    this.isPaused = false;
 
     this.init();
   }
 
   init() {
     this.container.innerHTML = '';
-    const width = this.container.clientWidth || 800;
-    const height = this.container.clientHeight || 500;
+    const width = Math.max(300, this.container.clientWidth || 800);
+    const height = Math.max(200, this.container.clientHeight || 500);
 
     // 1. Scene, Camera, Renderer
     this.scene = new THREE.Scene();
@@ -130,6 +131,11 @@ export class CyberRunner3DGame {
 
     this.boundResize = this.handleResize.bind(this);
     window.addEventListener('resize', this.boundResize);
+
+    if (window.ResizeObserver) {
+      this.resizeObserver = new ResizeObserver(() => this.handleResize());
+      this.resizeObserver.observe(this.container);
+    }
 
     this.spawnTimer = 0;
     this.isRunning = true;
@@ -357,17 +363,28 @@ export class CyberRunner3DGame {
   animate() {
     if (!this.isRunning) return;
     this.animationId = requestAnimationFrame(this.animate.bind(this));
+    if (this.isPaused) return;
     this.update();
     this.renderer.render(this.scene, this.camera);
   }
 
+  pause() {
+    this.isPaused = true;
+  }
+
+  resume() {
+    this.isPaused = false;
+  }
+
   handleResize() {
-    if (!this.container || !this.renderer) return;
+    if (!this.container || !this.renderer || !this.camera) return;
     const width = this.container.clientWidth;
     const height = this.container.clientHeight;
-    this.camera.aspect = width / height;
-    this.camera.updateProjectionMatrix();
-    this.renderer.setSize(width, height);
+    if (width > 0 && height > 0) {
+      this.camera.aspect = width / height;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(width, height);
+    }
   }
 
   endGame() {
@@ -383,6 +400,10 @@ export class CyberRunner3DGame {
     if (this.animationId) cancelAnimationFrame(this.animationId);
     window.removeEventListener('keydown', this.boundKeyDown);
     window.removeEventListener('resize', this.boundResize);
+
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
 
     if (this.renderer && this.renderer.domElement) {
       this.renderer.domElement.remove();

@@ -25,6 +25,7 @@ export class QuantumArcadeGame {
     this.enemies = [];
     this.particles = [];
     this.keys = {};
+    this.isPaused = false;
 
     this.init();
   }
@@ -77,6 +78,11 @@ export class QuantumArcadeGame {
     this.boundResize = this.resize.bind(this);
     window.addEventListener('resize', this.boundResize);
 
+    if (window.ResizeObserver) {
+      this.resizeObserver = new ResizeObserver(() => this.resize());
+      this.resizeObserver.observe(this.container);
+    }
+
     this.isRunning = true;
     this.spawnTimer = 0;
     this.animate();
@@ -84,8 +90,15 @@ export class QuantumArcadeGame {
 
   resize() {
     if (!this.container || !this.canvas) return;
-    this.canvas.width = this.container.clientWidth || 800;
-    this.canvas.height = this.container.clientHeight || 500;
+    const w = this.container.clientWidth;
+    const h = this.container.clientHeight;
+    if (w > 0 && h > 0) {
+      this.canvas.width = w;
+      this.canvas.height = h;
+    } else {
+      this.canvas.width = 800;
+      this.canvas.height = 500;
+    }
   }
 
   fireAction() {
@@ -357,8 +370,17 @@ export class QuantumArcadeGame {
   animate() {
     if (!this.isRunning) return;
     this.animId = requestAnimationFrame(this.animate.bind(this));
+    if (this.isPaused) return;
     this.update();
     this.draw();
+  }
+
+  pause() {
+    this.isPaused = true;
+  }
+
+  resume() {
+    this.isPaused = false;
   }
 
   endGame() {
@@ -375,6 +397,11 @@ export class QuantumArcadeGame {
     window.removeEventListener('keydown', this.boundKeyDown);
     window.removeEventListener('keyup', this.boundKeyUp);
     window.removeEventListener('resize', this.boundResize);
+
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+
     if (this.canvas) {
       this.canvas.removeEventListener('mousemove', this.boundPointerMove);
       this.canvas.removeEventListener('touchmove', this.boundPointerMove);

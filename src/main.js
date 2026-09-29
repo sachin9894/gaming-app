@@ -21,7 +21,9 @@ const appState = {
   searchQuery: '',
   currentGameInstance: null,
   activeGameData: null,
-  totalSessions: parseInt(localStorage.getItem('nexus3d_sessions')) || 42890
+  totalSessions: parseInt(localStorage.getItem('nexus3d_sessions')) || 42890,
+  highScores: JSON.parse(localStorage.getItem('nexus3d_highscores')) || {},
+  isGamePaused: false
 };
 
 // PWA deferred prompt
@@ -188,23 +190,58 @@ function renderGamesCatalog() {
 // -------------------------------------------------------------
 // 3. LAUNCH INTERACTIVE GAME ARENA (ALL GAMES LIVE!)
 // -------------------------------------------------------------
+function formatControlsHint(hint) {
+  if (!hint) {
+    return `<span class="kbd-badge">◀</span> <span class="kbd-badge">▶</span> Steer <span class="kbd-sep">•</span> <span class="kbd-badge">SPACE</span> Action <span class="kbd-sep">•</span> <span class="kbd-badge">P</span> Pause`;
+  }
+  return hint
+    .replace(/(Left\/Right|Arrows|WASD)/gi, '<span class="kbd-badge">$1</span>')
+    .replace(/(Space|Click|Tap|Drag|Enter)/gi, '<span class="kbd-badge">$1</span>')
+    + ` <span class="kbd-sep">•</span> <span class="kbd-badge">P</span> Pause`;
+}
+
 function launchGame(game) {
   sound.playUiBeep(700, 'sine');
   appState.activeGameData = game;
+  appState.isGamePaused = false;
   appState.totalSessions++;
   localStorage.setItem('nexus3d_sessions', appState.totalSessions.toString());
 
   const modal = document.getElementById('game-modal');
   const titleEl = document.getElementById('modal-game-title');
+  const badgeEl = document.getElementById('modal-game-badge');
   const canvasContainer = document.getElementById('game-canvas-container');
   const controlsHint = document.getElementById('game-controls-hint');
   const hudScore = document.getElementById('hud-score-val');
+  const hudBest = document.getElementById('hud-best-val');
   const hudSub = document.getElementById('hud-sub-val');
+  const hudSubLabel = document.getElementById('hud-sub-label');
+  const pauseOverlay = document.getElementById('game-pause-overlay');
+  const gameOverOverlay = document.getElementById('game-over-overlay');
+  const pauseGameName = document.getElementById('pause-game-name');
 
-  if (titleEl) titleEl.innerText = `${game.title} (3D ARENA)`;
-  if (controlsHint) controlsHint.innerText = game.controls;
+  const bestScore = appState.highScores[game.id] || 0;
+
+  if (titleEl) titleEl.innerText = game.title;
+  if (badgeEl) badgeEl.innerText = (game.category || '3D CYBER').toUpperCase();
+  if (pauseGameName) pauseGameName.innerText = game.title;
+
   if (hudScore) hudScore.innerText = '0';
-  if (hudSub) hudSub.innerText = '0';
+  if (hudBest) hudBest.innerText = bestScore.toLocaleString();
+  if (hudSub) hudSub.innerText = '0 🪙';
+  if (hudSubLabel) {
+    if (game.playableType === 'threejs-blaster') hudSubLabel.innerText = 'SHIELD';
+    else if (game.playableType === 'threejs-pong') hudSubLabel.innerText = 'VERSUS';
+    else hudSubLabel.innerText = 'REWARD';
+  }
+
+  if (controlsHint) {
+    controlsHint.innerHTML = formatControlsHint(game.controls);
+  }
+
+  // Ensure overlays are hidden
+  if (pauseOverlay) pauseOverlay.classList.add('hidden');
+  if (gameOverOverlay) gameOverOverlay.classList.add('hidden');
 
   modal.classList.remove('hidden');
 
@@ -214,58 +251,101 @@ function launchGame(game) {
     appState.currentGameInstance = null;
   }
 
-  // Handle Playable 3D WebGL Engines
-  if (game.playableType === 'threejs-runner') {
-    appState.currentGameInstance = new CyberRunner3DGame(
-      canvasContainer,
-      onGameOverHandler,
-      (score, coins) => {
-        if (hudScore) hudScore.innerText = score;
-        if (hudSub) hudSub.innerText = `${coins} 🪙`;
-      }
-    );
-  } else if (game.playableType === 'threejs-tunnel') {
-    appState.currentGameInstance = new NeonTunnel3DGame(
-      canvasContainer,
-      onGameOverHandler,
-      (score, bonus) => {
-        if (hudScore) hudScore.innerText = score;
-        if (hudSub) hudSub.innerText = `${bonus} 🪙`;
-      }
-    );
-  } else if (game.playableType === 'threejs-blaster') {
-    appState.currentGameInstance = new SpaceBlaster3DGame(
-      canvasContainer,
-      onGameOverHandler,
-      (score, shields) => {
-        if (hudScore) hudScore.innerText = score;
-        if (hudSub) hudSub.innerText = `${shields}% SHIELD`;
-      }
-    );
-  } else if (game.playableType === 'threejs-pong') {
-    appState.currentGameInstance = new CyberPong3DGame(
-      canvasContainer,
-      onGameOverHandler,
-      (playerScore, aiScore) => {
-        if (hudScore) hudScore.innerText = `YOU: ${playerScore}`;
-        if (hudSub) hudSub.innerText = `AI: ${aiScore}`;
-      }
-    );
-  } else {
-    // Universal Interactive 3D Cyber Engine for all remaining games
-    appState.currentGameInstance = new QuantumArcadeGame(
-      canvasContainer,
-      game,
-      onGameOverHandler,
-      (score, status) => {
-        if (hudScore) hudScore.innerText = score;
-        if (hudSub) hudSub.innerText = status;
-      }
-    );
-  }
+  // Wait for layout pass to ensure container clientWidth and clientHeight are accurate
+  requestAnimationFrame(() => {
+    if (game.playableType === 'threejs-runner') {
+      appState.currentGameInstance = new CyberRunner3DGame(
+        canvasContainer,
+        onGameOverHandler,
+        (score, coins) => {
+          if (hudScore) hudScore.innerText = score.toLocaleString();
+          if (hudSub) hudSub.innerText = `${coins} 🪙`;
+          if (score > (appState.highScores[game.id] || 0)) {
+            if (hudBest) hudBest.innerText = score.toLocaleString();
+          }
+        }
+      );
+    } else if (game.playableType === 'threejs-tunnel') {
+      appState.currentGameInstance = new NeonTunnel3DGame(
+        canvasContainer,
+        onGameOverHandler,
+        (score, bonus) => {
+          if (hudScore) hudScore.innerText = score.toLocaleString();
+          if (hudSub) hudSub.innerText = `${bonus} 🪙`;
+          if (score > (appState.highScores[game.id] || 0)) {
+            if (hudBest) hudBest.innerText = score.toLocaleString();
+          }
+        }
+      );
+    } else if (game.playableType === 'threejs-blaster') {
+      appState.currentGameInstance = new SpaceBlaster3DGame(
+        canvasContainer,
+        onGameOverHandler,
+        (score, shields) => {
+          if (hudScore) hudScore.innerText = score.toLocaleString();
+          if (hudSub) hudSub.innerText = `${shields}%`;
+          if (score > (appState.highScores[game.id] || 0)) {
+            if (hudBest) hudBest.innerText = score.toLocaleString();
+          }
+        }
+      );
+    } else if (game.playableType === 'threejs-pong') {
+      appState.currentGameInstance = new CyberPong3DGame(
+        canvasContainer,
+        onGameOverHandler,
+        (playerScore, aiScore) => {
+          if (hudScore) hudScore.innerText = `YOU: ${playerScore}`;
+          if (hudSub) hudSub.innerText = `AI: ${aiScore}`;
+        }
+      );
+    } else {
+      appState.currentGameInstance = new QuantumArcadeGame(
+        canvasContainer,
+        game,
+        onGameOverHandler,
+        (score, status) => {
+          if (hudScore) hudScore.innerText = score.toLocaleString();
+          if (hudSub) hudSub.innerText = typeof status === 'number' ? `${status}%` : status;
+          if (score > (appState.highScores[game.id] || 0)) {
+            if (hudBest) hudBest.innerText = score.toLocaleString();
+          }
+        }
+      );
+    }
+  });
 
-  // Setup mobile touch triggers for the active game
   setupMobileTouchControls();
+}
+
+function toggleGamePause() {
+  if (!appState.currentGameInstance) return;
+  if (appState.isGamePaused) {
+    resumeGame();
+  } else {
+    pauseGame();
+  }
+}
+
+function pauseGame() {
+  if (!appState.currentGameInstance || appState.isGamePaused) return;
+  appState.isGamePaused = true;
+  if (appState.currentGameInstance.pause) {
+    appState.currentGameInstance.pause();
+  }
+  sound.playUiBeep(450, 'sine');
+  const pauseOverlay = document.getElementById('game-pause-overlay');
+  if (pauseOverlay) pauseOverlay.classList.remove('hidden');
+}
+
+function resumeGame() {
+  if (!appState.currentGameInstance) return;
+  appState.isGamePaused = false;
+  if (appState.currentGameInstance.resume) {
+    appState.currentGameInstance.resume();
+  }
+  sound.playUiBeep(650, 'sine');
+  const pauseOverlay = document.getElementById('game-pause-overlay');
+  if (pauseOverlay) pauseOverlay.classList.add('hidden');
 }
 
 function setupMobileTouchControls() {
@@ -273,46 +353,77 @@ function setupMobileTouchControls() {
   const actionBtn = document.getElementById('touch-action-btn');
   const rightBtn = document.getElementById('touch-right-btn');
 
-  if (leftBtn) {
-    leftBtn.onclick = () => {
-      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+  function bindPress(btn, key) {
+    if (!btn) return;
+    btn.onpointerdown = (e) => {
+      e.preventDefault();
+      window.dispatchEvent(new KeyboardEvent('keydown', { key }));
+    };
+    btn.onpointerup = (e) => {
+      e.preventDefault();
+      window.dispatchEvent(new KeyboardEvent('keyup', { key }));
+    };
+    btn.onpointerleave = () => {
+      window.dispatchEvent(new KeyboardEvent('keyup', { key }));
     };
   }
-  if (rightBtn) {
-    rightBtn.onclick = () => {
-      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
-    };
-  }
-  if (actionBtn) {
-    actionBtn.onclick = () => {
-      window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ' }));
-    };
-  }
+
+  bindPress(leftBtn, 'ArrowLeft');
+  bindPress(rightBtn, 'ArrowRight');
+  bindPress(actionBtn, ' ');
 }
 
 function onGameOverHandler(finalScore, bonus) {
   sound.playExplosion();
+  const game = appState.activeGameData;
+  const gameId = game ? game.id : 'unknown';
   const earnedCoins = Math.max(50, Math.floor(finalScore / 8));
   addCoins(earnedCoins);
-
-  // Update leaderboard with user's score
   submitScoreToLeaderboard(finalScore);
 
-  setTimeout(() => {
-    confetti({ particleCount: 75, spread: 80 });
-    const restart = confirm(`⚡ MISSION COMPLETE!\n\nFinal Score: ${finalScore}\nCyber Coins Earned: +${earnedCoins} 🪙\n\nWould you like to play again?`);
-    if (restart) {
-      if (appState.activeGameData) launchGame(appState.activeGameData);
+  const prevBest = appState.highScores[gameId] || 0;
+  const isNewRecord = finalScore > prevBest;
+  if (isNewRecord) {
+    appState.highScores[gameId] = finalScore;
+    localStorage.setItem('nexus3d_highscores', JSON.stringify(appState.highScores));
+  }
+
+  // Update Game Over Overlay
+  const gameOverOverlay = document.getElementById('game-over-overlay');
+  const titleEl = document.getElementById('game-over-title');
+  const scoreEl = document.getElementById('game-over-score');
+  const coinsEl = document.getElementById('game-over-coins');
+  const bestEl = document.getElementById('game-over-best');
+  const recordAlert = document.getElementById('new-record-alert');
+
+  if (titleEl && game) titleEl.innerText = game.title.toUpperCase();
+  if (scoreEl) scoreEl.innerText = finalScore.toLocaleString();
+  if (coinsEl) coinsEl.innerText = `+${earnedCoins} 🪙`;
+  if (bestEl) bestEl.innerText = (isNewRecord ? finalScore : prevBest).toLocaleString();
+
+  if (recordAlert) {
+    if (isNewRecord && finalScore > 0) {
+      recordAlert.classList.remove('hidden');
     } else {
-      closeGameModal();
+      recordAlert.classList.add('hidden');
     }
-  }, 350);
+  }
+
+  setTimeout(() => {
+    confetti({ particleCount: 85, spread: 80, origin: { y: 0.6 } });
+    if (gameOverOverlay) gameOverOverlay.classList.remove('hidden');
+  }, 250);
 }
 
 function closeGameModal() {
   sound.playUiBeep(400, 'sine');
   const modal = document.getElementById('game-modal');
+  const pauseOverlay = document.getElementById('game-pause-overlay');
+  const gameOverOverlay = document.getElementById('game-over-overlay');
+
   if (modal) modal.classList.add('hidden');
+  if (pauseOverlay) pauseOverlay.classList.add('hidden');
+  if (gameOverOverlay) gameOverOverlay.classList.add('hidden');
 
   if (appState.currentGameInstance && appState.currentGameInstance.destroy) {
     appState.currentGameInstance.destroy();
@@ -626,10 +737,18 @@ document.addEventListener('DOMContentLoaded', () => {
   if (closeLbDrawer) closeLbDrawer.addEventListener('click', hideLbDrawer);
   if (lbBackdrop) lbBackdrop.addEventListener('click', hideLbDrawer);
 
-  // Game Modal Controls
+  // Game Modal Controls & Overlays
   const closeGameModalBtn = document.getElementById('close-game-modal-btn');
   const gameExitBtn = document.getElementById('game-exit-btn');
   const gameRestartBtn = document.getElementById('game-restart-btn');
+  const hudPauseBtn = document.getElementById('hud-pause-btn');
+  const pauseResumeBtn = document.getElementById('pause-resume-btn');
+  const pauseRestartBtn = document.getElementById('pause-restart-btn');
+  const pauseExitBtn = document.getElementById('pause-exit-btn');
+  const gameoverRestartBtn = document.getElementById('gameover-restart-btn');
+  const gameoverExitBtn = document.getElementById('gameover-exit-btn');
+  const gameAudioToolBtn = document.getElementById('game-audio-tool-btn');
+  const gameFullscreenToolBtn = document.getElementById('game-fullscreen-tool-btn');
 
   if (closeGameModalBtn) closeGameModalBtn.addEventListener('click', closeGameModal);
   if (gameExitBtn) gameExitBtn.addEventListener('click', closeGameModal);
@@ -638,6 +757,74 @@ document.addEventListener('DOMContentLoaded', () => {
       if (appState.activeGameData) launchGame(appState.activeGameData);
     });
   }
+
+  if (hudPauseBtn) hudPauseBtn.addEventListener('click', toggleGamePause);
+  if (pauseResumeBtn) pauseResumeBtn.addEventListener('click', resumeGame);
+  if (pauseRestartBtn) {
+    pauseRestartBtn.addEventListener('click', () => {
+      if (appState.activeGameData) launchGame(appState.activeGameData);
+    });
+  }
+  if (pauseExitBtn) pauseExitBtn.addEventListener('click', closeGameModal);
+
+  if (gameoverRestartBtn) {
+    gameoverRestartBtn.addEventListener('click', () => {
+      if (appState.activeGameData) launchGame(appState.activeGameData);
+    });
+  }
+  if (gameoverExitBtn) gameoverExitBtn.addEventListener('click', closeGameModal);
+
+  // In-Game Audio Toggle Tool
+  if (gameAudioToolBtn) {
+    gameAudioToolBtn.addEventListener('click', () => {
+      const isMuted = sound.toggleMute();
+      gameAudioToolBtn.innerText = isMuted ? '🔇 Muted' : '🎵 Sound';
+      gameAudioToolBtn.style.color = isMuted ? 'var(--neon-pink)' : 'var(--neon-blue)';
+      const mainAudioBtn = document.getElementById('audio-toggle-btn');
+      if (mainAudioBtn) {
+        mainAudioBtn.innerText = isMuted ? '🔇 MUTED' : '🎵 SOUND';
+        mainAudioBtn.style.color = isMuted ? 'var(--neon-magenta)' : 'var(--neon-cyan)';
+      }
+    });
+  }
+
+  // In-Game Fullscreen Toggle Tool
+  if (gameFullscreenToolBtn) {
+    gameFullscreenToolBtn.addEventListener('click', () => {
+      const arena = document.getElementById('game-arena-wrapper');
+      if (!document.fullscreenElement) {
+        if (arena && arena.requestFullscreen) {
+          arena.requestFullscreen().catch(() => {});
+        }
+        gameFullscreenToolBtn.innerText = '⛶ Minimize';
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+        gameFullscreenToolBtn.innerText = '⛶ Maximize';
+      }
+    });
+  }
+
+  // Global In-Game Keyboard Shortcuts (Pause, Escape, Space to Restart)
+  window.addEventListener('keydown', (e) => {
+    const gameModal = document.getElementById('game-modal');
+    if (!gameModal || gameModal.classList.contains('hidden')) return;
+
+    const gameOverOverlay = document.getElementById('game-over-overlay');
+    const isGameOver = gameOverOverlay && !gameOverOverlay.classList.contains('hidden');
+
+    if (e.key === 'p' || e.key === 'P') {
+      if (!isGameOver) {
+        toggleGamePause();
+      }
+    } else if (e.key === 'Escape') {
+      closeGameModal();
+    } else if (e.key === ' ' && isGameOver) {
+      e.preventDefault();
+      if (appState.activeGameData) launchGame(appState.activeGameData);
+    }
+  });
 
   // Setup Isolated Admin Panel
   const adminPanel = new AdminControlPanel(appState, () => {
