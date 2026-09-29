@@ -1,0 +1,19 @@
+{
+  "name": "NEXUS 3D - Futuristic Cyber Gaming Hub",
+  "short_name": "NEXUS 3D",
+  "description": "Futuristic 3D Web & Mobile Gaming Platform with 20 Cyber Games, Leaderboards & Online Arena",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#070a14",
+  "theme_color": "#00f3ff",
+  "icons": [
+    {
+      "src": "./app-icon.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["games", "entertainment"]
+}

@@ -1,0 +1,18 @@
+{
+  "appId": "com.nexus3d.cyberarcade",
+  "appName": "Nexus 3D Cyber Arcade",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "buildOptions": {
+      "keystorePath": "",
+      "keystorePassword": "",
+      "keystoreAlias": "",
+      "keystoreAliasPassword": "",
+      "releaseType": "APK"
+    }
+  }
+}

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NEXUS 3D | Compact Modern Cyber Arcade</title>
+  <meta name="description" content="Next-generation compact 3D gaming hub. 20 cyber games, real-time servers, global leaderboards and Android APK ready.">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#00f3ff">
+  <link rel="icon" type="image/jpeg" href="/app-icon.jpg">
+  <script type="module" crossorigin src="/assets/index-xRive1If.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DGe-u62-.css">
+</head>
+<body>
+
+  <!-- ================= COMPACT MODERN APP HEADER ================= -->
+  <header class="app-header">
+    <div class="brand-box" id="brand-home-btn">
+      <img src="/app-icon.jpg" alt="Nexus 3D Logo" class="brand-icon">
+      <div class="brand-name">NEXUS<span>3D</span></div>
+    </div>
+
+    <!-- Center Category Navigation Pills -->
+    <nav class="header-center-nav">
+      <button class="nav-pill active" data-filter="all">All (20)</button>
+      <button class="nav-pill" data-filter="action">Action</button>
+      <button class="nav-pill" data-filter="shooter">Shooters</button>
+      <button class="nav-pill" data-filter="racing">Racing</button>
+      <button class="nav-pill" data-filter="puzzle">Puzzles</button>
+    </nav>
+
+    <!-- Right Quick Actions -->
+    <div class="header-right">
+      <div class="chip-status">
+        <span class="pulse-dot"></span>
+        <span>1.4k Online</span>
+      </div>
+
+      <div class="chip-coins">
+        <span>🪙</span>
+        <span id="player-coins-val">2,500</span>
+      </div>
+
+      <button class="btn-icon" id="audio-toggle-btn" title="Toggle Sound FX">
+        🎵
+      </button>
+
+      <!-- Drawers Toggles -->
+      <button class="btn-icon" id="toggle-chat-btn" title="Open Global Chat">
+        💬
+      </button>
+
+      <button class="btn-icon" id="toggle-lb-btn" title="Open Leaderboard">
+        🏆
+      </button>
+
+      <!-- Compact APK Download -->
+      <button class="btn-apk-compact" id="open-apk-modal-btn">
+        📲 Get App
+      </button>
+    </div>
+  </header>
+
+  <!-- Slim Dynamic Announcement Ticker -->
+  <div class="compact-ticker" id="announcement-banner">
+    <div class="ticker-content">
+      <span class="ticker-tag">LIVE</span>
+      <span>Season 1 Cyber Championship is LIVE! Win 50,000 Cyber Coins!</span>
+    </div>
+    <div style="font-size: 0.72rem; color: var(--neon-blue); cursor: pointer;" id="daily-quest-trigger">
+      🎁 Claim Daily +500 🪙
+    </div>
+  </div>
+
+  <!-- ================= MAIN CONTENT LAYOUT ================= -->
+  <main class="main-layout">
+
+    <!-- Compact Modern Spotlight Card (Neo-Tokyo Arcade Portal) -->
+    <section class="spotlight-card">
+      <div class="spotlight-bg" style="background-image: url('/hero-banner.jpg');"></div>
+      <div class="spotlight-overlay"></div>
+      <canvas id="hero-bg-canvas" class="spotlight-canvas"></canvas>
+
+      <div class="spotlight-content">
+        <span class="spotlight-badge">FEATURED 3D SPOTLIGHT</span>
+        <h1 class="spotlight-title">CYBER RUNNER: <span>PULSE 3D</span></h1>
+        <p class="spotlight-desc">
+          Sprint across lightspeed neon highways, dodge quantum laser barriers, and claim high-value energy cores at 60 FPS WebGL.
+        </p>
+
+        <div class="spotlight-actions">
+          <button class="btn-play-spotlight" id="hero-quick-play-btn">
+            ⚡ Play Now (3D)
+          </button>
+          <button class="btn-reward-compact" id="hero-daily-quest-btn">
+            🎁 Daily Reward (+500 🪙)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Compact Games Vault Bar with Live Search -->
+    <div class="vault-bar">
+      <div class="vault-title-group">
+        <h2 class="vault-heading">Games Vault</h2>
+        <span class="vault-count" id="stat-total-games">20 Games</span>
+      </div>
+      <div class="vault-search-box">
+        <span style="font-size: 0.8rem; color: var(--neon-blue);">🔍</span>
+        <input type="text" id="game-search-input" class="vault-search-input" placeholder="Search 3D games..." autocomplete="off">
+      </div>
+    </div>
+
+    <!-- High-Density Compact 20 Games Grid -->
+    <div class="games-grid" id="games-grid-container">
+      <!-- Injected dynamically from gamesData.js -->
+    </div>
+  </main>
+
+  <!-- ================= SLIDE-OUT CHAT DRAWER ================= -->
+  <div class="drawer-backdrop" id="chat-drawer-backdrop"></div>
+  <aside class="drawer-overlay" id="chat-drawer">
+    <div class="drawer-header">
+      <div class="drawer-title">💬 Global Cyber Chat</div>
+      <button class="btn-close" id="close-chat-drawer">&times;</button>
+    </div>
+    <div class="drawer-body" id="chat-messages-box">
+      <!-- Chat bubbles rendered dynamically -->
+    </div>
+    <div class="drawer-footer">
+      <form class="chat-input-row" id="chat-form">
+        <input type="text" id="chat-input" placeholder="Type message..." autocomplete="off" maxlength="80">
+        <button type="submit" class="btn-play-card">Send</button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- ================= SLIDE-OUT LEADERBOARD DRAWER ================= -->
+  <div class="drawer-backdrop" id="lb-drawer-backdrop"></div>
+  <aside class="drawer-overlay" id="lb-drawer">
+    <div class="drawer-header">
+      <div class="drawer-title">🏆 Top Cyber Gamers</div>
+      <button class="btn-close" id="close-lb-drawer">&times;</button>
+    </div>
+    <div class="drawer-body" id="leaderboard-list-box">
+      <!-- Leaderboard items rendered dynamically -->
+    </div>
+  </aside>
+
+  <!-- ================= COMPACT 3D GAME ARENA MODAL ================= -->
+  <div class="modal-overlay hidden" id="game-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-game-title">Cyber Runner 3D</div>
+        <button class="btn-close" id="close-game-modal-btn">&times;</button>
+      </div>
+
+      <div class="game-arena-wrapper">
+        <div id="game-canvas-container" class="game-canvas-container"></div>
+
+        <!-- In-Game Minimal HUD -->
+        <div class="game-hud-overlay">
+          <div class="hud-stat-chip">SCORE: <span id="hud-score-val" style="color: var(--neon-blue)">0</span></div>
+          <div class="hud-stat-chip">REWARD: <span id="hud-sub-val" style="color: var(--accent-gold)">0</span></div>
+        </div>
+
+        <!-- Touch Controls for Phone -->
+        <div class="touch-controls-bar" id="touch-controls-bar">
+          <button class="touch-btn" id="touch-left-btn">◀</button>
+          <button class="touch-btn" id="touch-action-btn">▲</button>
+          <button class="touch-btn" id="touch-right-btn">▶</button>
+        </div>
+      </div>
+
+      <div class="game-modal-footer">
+        <div id="game-controls-hint">Controls: Left/Right to Steer, Space to Jump/Fire</div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn-play-card" id="game-restart-btn">🔄 Restart</button>
+          <button class="btn-reward-compact" id="game-exit-btn">Exit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= APK & PWA MODAL ================= -->
+  <div class="modal-overlay hidden" id="apk-modal">
+    <div class="modal-content" style="max-width: 680px;">
+      <div class="modal-header">
+        <div class="modal-title">📲 Install Nexus 3D App / APK</div>
+        <button class="btn-close" id="apk-close-btn">&times;</button>
+      </div>
+
+      <div style="padding: 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; background: rgba(0, 243, 255, 0.06); border: var(--border-subtle); border-radius: 10px; padding: 1rem; margin-bottom: 1.2rem;">
+          <img src="/app-icon.jpg" style="width: 58px; height: 58px; border-radius: 12px; object-fit: cover;">
+          <div>
+            <h4 style="font-weight: 700; color: #fff;">Nexus 3D Cyber Arcade (v1.0)</h4>
+            <p style="color: var(--text-muted); font-size: 0.78rem; margin: 0.2rem 0;">
+              Package: <code>com.nexus3d.cyberarcade</code> • 20 Full 3D Games
+            </p>
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
+              <button class="btn-apk-compact" id="direct-apk-download-btn">
+                ⬇️ Download .APK
+              </button>
+              <button class="btn-reward-compact" id="pwa-install-trigger-btn" style="font-size: 0.75rem;">
+                ⚡ 1-Click Install PWA
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <h5 style="font-size: 0.82rem; color: var(--neon-blue); margin-bottom: 0.6rem;">Convert to Native Play Store APK with Capacitor:</h5>
+        <div style="background: rgba(0,0,0,0.4); padding: 0.8rem; border-radius: 8px; font-size: 0.78rem; font-family: monospace; color: #a5f3fc; line-height: 1.6;">
+          npm run build<br>
+          npx cap add android<br>
+          npx cap open android
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ISOLATED ADMIN OPERATOR MODAL ================= -->
+  <div class="modal-overlay hidden" id="admin-modal">
+    <div class="modal-content" style="max-width: 860px;">
+      <div class="modal-header" style="border-bottom: 1px solid rgba(255, 183, 3, 0.3);">
+        <div class="modal-title" style="color: var(--accent-yellow);">🛡️ System Operator Console</div>
+        <button class="btn-close" id="admin-close-btn">&times;</button>
+      </div>
+
+      <div id="admin-auth-view" class="admin-card-body" style="text-align: center; padding: 2rem 1rem;">
+        <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">🔐</div>
+        <h4 style="margin-bottom: 0.3rem;">Operator Access Required</h4>
+        <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1rem;">
+          Enter operator PIN to manage 20 games, telemetry, and broadcasts.
+        </p>
+        <div style="display: flex; justify-content: center; gap: 0.4rem; max-width: 280px; margin: 0 auto 1rem auto;">
+          <input type="password" id="admin-pin-input" placeholder="PIN: 7777" style="padding: 0.5rem; border-radius: 6px; background: #070d1e; border: 1px solid var(--accent-yellow); color: #fff; text-align: center; width: 100%;">
+          <button class="btn-play-spotlight" id="admin-login-btn" style="background: var(--accent-yellow);">Login</button>
+        </div>
+        <button class="btn-reward-compact" id="admin-quick-fill" style="font-size: 0.72rem;">
+          Auto Fill Default PIN (7777)
+        </button>
+      </div>
+
+      <div id="admin-dashboard-view" class="admin-card-body hidden">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
+          <div class="admin-box">
+            <div style="font-size: 1.1rem; font-weight: 700; color: var(--accent-cyan);" id="admin-stat-active">1,429</div>
+            <div style="font-size: 0.7rem; color: var(--text-muted);">Active Gamers</div>
+          </div>
+          <div class="admin-box">
+            <div style="font-size: 1.1rem; font-weight: 700; color: var(--accent-cyan);" id="admin-stat-plays">42,890</div>
+            <div style="font-size: 0.7rem; color: var(--text-muted);">Game Sessions</div>
+          </div>
+          <div class="admin-box">
+            <div style="font-size: 1.1rem; font-weight: 700; color: var(--accent-yellow);" id="admin-stat-coins">502,500</div>
+            <div style="font-size: 0.7rem; color: var(--text-muted);">Coins Circulation</div>
+          </div>
+          <div class="admin-box">
+            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+              <input type="checkbox" id="admin-server-toggle" checked>
+              <span style="font-size: 0.75rem; font-weight: 700; color: var(--accent-green);">SERVER ONLINE</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="admin-box" style="margin-bottom: 1rem;">
+          <div class="admin-box-title">📢 Broadcast Announcement</div>
+          <div style="display: flex; gap: 0.4rem;">
+            <input type="text" id="broadcast-input" placeholder="Announcement banner..." style="flex: 1; padding: 0.45rem; border-radius: 6px; background: #070d1e; border: var(--border-subtle); color: #fff; font-size: 0.8rem;">
+            <button class="btn-play-card" id="broadcast-submit-btn">Broadcast</button>
+          </div>
+        </div>
+
+        <div class="admin-grid">
+          <div class="admin-box">
+            <div class="admin-box-title">🎮 20 Games Toggle</div>
+            <div style="max-height: 240px; overflow-y: auto;" id="admin-games-list"></div>
+          </div>
+
+          <div class="admin-box">
+            <div class="admin-box-title">➕ Add New Game</div>
+            <div style="display: flex; flex-direction: column; gap: 0.45rem;">
+              <input type="text" id="new-game-title" placeholder="Title (e.g. Cyber Kart 3D)" style="padding: 0.4rem; border-radius: 6px; background: #070d1e; border: var(--border-subtle); color: #fff; font-size: 0.78rem;">
+              <select id="new-game-category" style="padding: 0.4rem; border-radius: 6px; background: #070d1e; border: var(--border-subtle); color: #fff; font-size: 0.78rem;">
+                <option value="action">Action</option>
+                <option value="shooter">Shooter</option>
+                <option value="racing">Racing</option>
+                <option value="puzzle">Puzzle</option>
+              </select>
+              <textarea id="new-game-desc" placeholder="Game Description..." rows="2" style="padding: 0.4rem; border-radius: 6px; background: #070d1e; border: var(--border-subtle); color: #fff; font-size: 0.78rem;"></textarea>
+              <button class="btn-play-card" id="add-game-submit-btn">+ Publish Game</button>
+            </div>
+            <div class="admin-box-title" style="margin-top: 1rem;">👥 User Management</div>
+            <div id="admin-users-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= COMPACT FOOTER ================= -->
+  <footer class="app-footer">
+    <div>© 2026 Nexus 3D Labs • 20 Games • WebGL 60FPS • Android APK Ready</div>
+    <div>
+      <a href="#admin" id="discrete-admin-link" class="discrete-operator-link">
+        🔒 Operator Console (PIN: 7777)
+      </a>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript bundle entry point -->
+</body>
+</html>
