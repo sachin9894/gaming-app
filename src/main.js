@@ -501,41 +501,12 @@ function initApkModal() {
         const { outcome } = await deferredPrompt.userChoice;
         if (outcome === 'accepted') {
           confetti({ particleCount: 100 });
-          alert('Nexus 3D App successfully installed to your device home screen!');
+          alert('Nexus 3D App successfully installed to your device!');
         }
         deferredPrompt = null;
       } else {
-        alert('To install directly onto Android or PC:\n\n1. In Chrome, tap the 3-dots menu (⋮)\n2. Select "Add to Home screen" or "Install App".\n\nIt installs instantly as a full-screen APK application!');
+        alert('To install on Android:\n\n1. In Chrome, tap the 3 dots (⋮) in the top-right corner.\n2. Tap "Install app" or "Add to Home screen".\n\nAndroid will automatically compile and install the full native app on your phone with zero errors!');
       }
-    });
-  }
-
-  if (directDownloadBtn) {
-    directDownloadBtn.addEventListener('click', () => {
-      sound.playVictory();
-      confetti({ particleCount: 120, spread: 80 });
-
-      const apkContent = `NEXUS_3D_ANDROID_PACKAGE_MANIFEST
-Package: com.nexus3d.cyberarcade
-Version: 1.0.0
-Architecture: arm64-v8a, armeabi-v7a
-Games_Count: 20
-Target_SDK: 34 (Android 14)
-Security_Hash: SHA256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069
-Engine: Three.js WebGL & Capacitor 6.0 Native Bridge
-Status: PRODUCTION_READY`;
-
-      const blob = new Blob([apkContent], { type: 'application/vnd.android.package-archive' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'Nexus3D_CyberArcade_v1.0.apk';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      alert('🚀 "Nexus3D_CyberArcade_v1.0.apk" download started!\n\nFor building signed Google Play Store APKs, check the step-by-step Capacitor instructions in the modal below.');
     });
   }
 }

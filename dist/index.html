@@ -8,7 +8,7 @@
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#00f3ff">
   <link rel="icon" type="image/jpeg" href="/app-icon.jpg">
-  <script type="module" crossorigin src="/assets/index-xRive1If.js"></script>
+  <script type="module" crossorigin src="/assets/index-CriJDvon.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-DGe-u62-.css">
 </head>
 <body>
@@ -191,29 +191,36 @@
       </div>
 
       <div style="padding: 1.25rem;">
-        <div style="display: flex; align-items: center; gap: 1rem; background: rgba(0, 243, 255, 0.06); border: var(--border-subtle); border-radius: 10px; padding: 1rem; margin-bottom: 1.2rem;">
-          <img src="/app-icon.jpg" style="width: 58px; height: 58px; border-radius: 12px; object-fit: cover;">
+        <div style="display: flex; align-items: center; gap: 1rem; background: rgba(0, 240, 255, 0.08); border: 1px solid rgba(0, 240, 255, 0.25); border-radius: 12px; padding: 1rem; margin-bottom: 1.2rem;">
+          <img src="/app-icon.jpg" style="width: 58px; height: 58px; border-radius: 12px; object-fit: cover; border: 1px solid var(--neon-blue);">
           <div>
-            <h4 style="font-weight: 700; color: #fff;">Nexus 3D Cyber Arcade (v1.0)</h4>
+            <h4 style="font-weight: 700; color: #fff;">Nexus 3D Cyber Arcade (Android)</h4>
             <p style="color: var(--text-muted); font-size: 0.78rem; margin: 0.2rem 0;">
-              Package: <code>com.nexus3d.cyberarcade</code> • 20 Full 3D Games
+              Full 3D WebGL • Standalone App • 0ms Latency
             </p>
             <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
-              <button class="btn-apk-compact" id="direct-apk-download-btn">
-                ⬇️ Download .APK
-              </button>
-              <button class="btn-reward-compact" id="pwa-install-trigger-btn" style="font-size: 0.75rem;">
-                ⚡ 1-Click Install PWA
+              <button class="btn-apk-compact" id="pwa-install-trigger-btn" style="padding: 0.4rem 1rem;">
+                ⚡ 1-Tap Install App to Phone
               </button>
             </div>
           </div>
         </div>
 
-        <h5 style="font-size: 0.82rem; color: var(--neon-blue); margin-bottom: 0.6rem;">Convert to Native Play Store APK with Capacitor:</h5>
-        <div style="background: rgba(0,0,0,0.4); padding: 0.8rem; border-radius: 8px; font-size: 0.78rem; font-family: monospace; color: #a5f3fc; line-height: 1.6;">
+        <div style="background: rgba(14, 19, 38, 0.7); border: var(--border-glass); border-radius: 10px; padding: 0.85rem; font-size: 0.8rem; line-height: 1.5; margin-bottom: 1rem;">
+          <strong style="color: var(--neon-blue);">💡 Mobile Par App Install Karne Ka Tarika:</strong><br>
+          1. Mobile Chrome me <strong>"⚡ 1-Tap Install App"</strong> par click karein.<br>
+          2. Agar prompt na dikhe, Chrome ke <strong>3 dots (⋮)</strong> menu par tap karke <strong>"Install app"</strong> ya <strong>"Add to Home Screen"</strong> chunein.<br>
+          3. Yeh bina kisi error ke direct aapke phone me install ho jayegi!
+        </div>
+
+        <h5 style="font-size: 0.82rem; color: var(--neon-purple); margin-bottom: 0.5rem;">Real Signed .APK File Generate Karne Ke Liye:</h5>
+        <div style="background: rgba(0,0,0,0.45); padding: 0.75rem; border-radius: 8px; font-size: 0.78rem; font-family: monospace; color: #a5f3fc; line-height: 1.6;">
+          <strong>Option 1 (Capacitor Native APK):</strong><br>
           npm run build<br>
           npx cap add android<br>
-          npx cap open android
+          npx cap open android (Android Studio me Build APK karein)<br><br>
+          <strong>Option 2 (PWABuilder 1-Click APK):</strong><br>
+          Railway live URL ko <a href="https://www.pwabuilder.com" target="_blank" style="color: var(--neon-blue);">PWABuilder.com</a> par dalein aur signed APK download karein.
         </div>
       </div>
     </div>
