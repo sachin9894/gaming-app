@@ -23,7 +23,8 @@ const appState = {
   activeGameData: null,
   totalSessions: parseInt(localStorage.getItem('nexus3d_sessions')) || 42890,
   highScores: JSON.parse(localStorage.getItem('nexus3d_highscores')) || {},
-  isGamePaused: false
+  isGamePaused: false,
+  recentGames: JSON.parse(localStorage.getItem('nexus3d_recent_games')) || ['cyber-runner-3d', 'space-blaster-3d', 'neon-tunnel-3d']
 };
 
 // PWA deferred prompt
@@ -41,7 +42,96 @@ if ('serviceWorker' in navigator) {
 }
 
 // -------------------------------------------------------------
-// 1. 3D INTERACTIVE HOLOGRAPHIC LOBBY OVERLAY
+// 1. FULL-SCREEN LOBBY AMBIENT 3D / 2D CANVAS
+// -------------------------------------------------------------
+function initLobbyAmbient() {
+  const canvas = document.getElementById('lobby-ambient-canvas');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  let width = (canvas.width = window.innerWidth);
+  let height = (canvas.height = window.innerHeight);
+
+  window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  });
+
+  const particles = [];
+  const count = Math.min(50, Math.floor(width / 28));
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (Math.random() - 0.5) * 0.35,
+      radius: Math.random() * 1.8 + 0.8,
+      color: i % 3 === 0 ? '#00f0ff' : (i % 3 === 1 ? '#a855f7' : '#38bdf8'),
+      alpha: Math.random() * 0.45 + 0.2
+    });
+  }
+
+  function draw() {
+    // Only animate when lobby is active to conserve 100% device power for active 3D games
+    if (document.body.classList.contains('state-lobby-active')) {
+      ctx.clearRect(0, 0, width, height);
+
+      // Faint ambient cyber grid
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.025)';
+      ctx.lineWidth = 1;
+      const gridSize = 70;
+      for (let x = 0; x < width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      // Draw floating nodes & laser connections
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        if (p.y > height) p.y = 0;
+
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+          if (dist < 95) {
+            ctx.strokeStyle = p.color;
+            ctx.globalAlpha = (1 - dist / 95) * 0.12;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        }
+      }
+      ctx.globalAlpha = 1;
+    }
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+}
+
+// -------------------------------------------------------------
+// 2. 3D HERO SPOTLIGHT INTERACTION
 // -------------------------------------------------------------
 function initHero3D() {
   const canvas = document.getElementById('hero-bg-canvas');
@@ -58,9 +148,9 @@ function initHero3D() {
   // Floating Quantum Energy Orbs
   const orbs = [];
   const orbGeo = new THREE.SphereGeometry(0.3, 12, 12);
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 35; i++) {
     const mat = new THREE.MeshBasicMaterial({
-      color: i % 2 === 0 ? 0x00f3ff : 0xff007f,
+      color: i % 2 === 0 ? 0x00f0ff : 0xa855f7,
       wireframe: true
     });
     const orb = new THREE.Mesh(orbGeo, mat);
@@ -88,21 +178,23 @@ function initHero3D() {
   function animateHero() {
     requestAnimationFrame(animateHero);
 
-    orbs.forEach((o) => {
-      o.position.y += o.userData.vy;
-      o.position.x += o.userData.vx;
-      o.rotation.x += o.userData.rot;
-      o.rotation.y += o.userData.rot;
+    if (document.body.classList.contains('state-lobby-active')) {
+      orbs.forEach((o) => {
+        o.position.y += o.userData.vy;
+        o.position.x += o.userData.vx;
+        o.rotation.x += o.userData.rot;
+        o.rotation.y += o.userData.rot;
 
-      if (o.position.y > 10 || o.position.y < -10) o.userData.vy *= -1;
-      if (o.position.x > 18 || o.position.x < -18) o.userData.vx *= -1;
-    });
+        if (o.position.y > 10 || o.position.y < -10) o.userData.vy *= -1;
+        if (o.position.x > 18 || o.position.x < -18) o.userData.vx *= -1;
+      });
 
-    camera.position.x += (mouseX * 3 - camera.position.x) * 0.04;
-    camera.position.y += (mouseY * 2 - camera.position.y) * 0.04;
-    camera.lookAt(0, 0, 0);
+      camera.position.x += (mouseX * 3 - camera.position.x) * 0.04;
+      camera.position.y += (mouseY * 2 - camera.position.y) * 0.04;
+      camera.lookAt(0, 0, 0);
 
-    renderer.render(scene, camera);
+      renderer.render(scene, camera);
+    }
   }
   animateHero();
 
@@ -117,7 +209,113 @@ function initHero3D() {
 }
 
 // -------------------------------------------------------------
-// 2. RENDER 20 GAMES CATALOG (WITH REAL GRAPHIC COVERS)
+// 3. RENDER FEATURED 3D TITLES
+// -------------------------------------------------------------
+function renderFeaturedGames() {
+  const container = document.getElementById('featured-games-container');
+  if (!container) return;
+
+  const featured = appState.games.filter((g) => g.featured);
+  const displayGames = featured.length >= 2 ? featured : appState.games.slice(0, 4);
+
+  container.innerHTML = displayGames.map((game) => {
+    const isEnabled = game.enabled !== false && appState.serverOnline !== false;
+    const coverImg = game.image || '/cover-runner.jpg';
+
+    return `
+      <div class="featured-game-card ${isEnabled ? '' : 'disabled-game'}" data-game-id="${game.id}">
+        <div class="featured-card-cover-wrap">
+          <img src="${coverImg}" class="featured-card-img" alt="${game.title}" loading="lazy">
+          <span class="featured-card-badge">${game.badge || '3D WEBGL'}</span>
+          <span class="featured-card-fps">60 FPS</span>
+        </div>
+        <div class="featured-card-body">
+          <div>
+            <h3 class="featured-card-title">${game.title}</h3>
+            <p class="featured-card-desc">${game.description}</p>
+          </div>
+          <div class="featured-card-footer">
+            <span class="game-card-rating">⭐ ${game.rating} • ${game.plays}</span>
+            <button class="btn-play-card ${isEnabled ? '' : 'btn-disabled'}" ${isEnabled ? '' : 'disabled'} data-play-id="${game.id}">
+              ${isEnabled ? '⚡ PLAY NOW' : 'OFFLINE'}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.querySelectorAll('.featured-game-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      const gId = card.dataset.gameId;
+      const game = appState.games.find((g) => g.id === gId);
+      if (game && game.enabled !== false && appState.serverOnline !== false) {
+        startTransitionToGame(game);
+      }
+    });
+  });
+}
+
+// -------------------------------------------------------------
+// 4. RENDER RECENTLY PLAYED MISSIONS
+// -------------------------------------------------------------
+function renderRecentlyPlayed() {
+  const container = document.getElementById('recent-games-container');
+  if (!container) return;
+
+  const recentList = (appState.recentGames || [])
+    .map((id) => appState.games.find((g) => g.id === id))
+    .filter(Boolean);
+
+  if (recentList.length === 0) {
+    container.innerHTML = `
+      <div class="recent-empty-card">
+        <span>🎮 No recent missions logged yet. Launch any 3D title below to start playing!</span>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = recentList.map((game) => {
+    const isEnabled = game.enabled !== false && appState.serverOnline !== false;
+    const coverImg = game.image || '/cover-runner.jpg';
+
+    return `
+      <div class="recent-game-card" data-recent-id="${game.id}">
+        <img src="${coverImg}" class="recent-card-thumb" alt="${game.title}" loading="lazy">
+        <div class="recent-card-info">
+          <div class="recent-card-title">${game.title}</div>
+          <div class="recent-card-meta">⭐ ${game.rating} • ${(game.category || 'Arcade').toUpperCase()}</div>
+        </div>
+        <button class="btn-play-card" style="padding: 0.25rem 0.65rem; font-size: 0.72rem;" data-play-id="${game.id}">
+          Launch
+        </button>
+      </div>
+    `;
+  }).join('');
+
+  container.querySelectorAll('.recent-game-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      const gId = card.dataset.recentId;
+      const game = appState.games.find((g) => g.id === gId);
+      if (game && game.enabled !== false && appState.serverOnline !== false) {
+        startTransitionToGame(game);
+      }
+    });
+  });
+}
+
+function recordRecentlyPlayed(gameId) {
+  if (!gameId) return;
+  const filtered = (appState.recentGames || []).filter((id) => id !== gameId);
+  filtered.unshift(gameId);
+  appState.recentGames = filtered.slice(0, 6);
+  localStorage.setItem('nexus3d_recent_games', JSON.stringify(appState.recentGames));
+  renderRecentlyPlayed();
+}
+
+// -------------------------------------------------------------
+// 5. RENDER 20 GAMES VAULT ARCHIVE
 // -------------------------------------------------------------
 function renderGamesCatalog() {
   const container = document.getElementById('games-grid-container');
@@ -172,42 +370,145 @@ function renderGamesCatalog() {
     `;
   }).join('');
 
-  // Attach Play click listeners
-  container.querySelectorAll('.btn-play-card').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const gId = btn.dataset.playId;
+  container.querySelectorAll('.game-card').forEach((card) => {
+    card.addEventListener('click', (e) => {
+      const gId = card.dataset.gameId;
       const game = appState.games.find((g) => g.id === gId);
-      if (game) launchGame(game);
+      if (game && game.enabled !== false && appState.serverOnline !== false) {
+        startTransitionToGame(game);
+      }
     });
   });
 
-  // Update total games counter
   const totalGamesEl = document.getElementById('stat-total-games');
-  if (totalGamesEl) totalGamesEl.innerText = `${appState.games.length} Games`;
+  if (totalGamesEl) totalGamesEl.innerText = `${filtered.length} of ${appState.games.length} Games`;
 }
 
 // -------------------------------------------------------------
-// 3. LAUNCH INTERACTIVE GAME ARENA (ALL GAMES LIVE!)
+// 6. LOBBY → GAME SEAMLESS HYPERSPACE WARP TRANSITION
+// -------------------------------------------------------------
+let transitionTimeout = null;
+
+function startTransitionToGame(game) {
+  if (!game || game.enabled === false || appState.serverOnline === false) return;
+
+  // Warp laser sound effect
+  if (sound && sound.playWarp) {
+    sound.playWarp();
+  } else {
+    sound.playUiBeep(700, 'sine');
+  }
+
+  const portal = document.getElementById('view-portal-transition');
+  const portalTitle = document.getElementById('portal-game-title');
+  const portalTip = document.getElementById('portal-game-tip');
+  const progressFill = document.getElementById('portal-progress-fill');
+  const lobbyView = document.getElementById('view-lobby');
+  const arenaView = document.getElementById('view-game-arena');
+
+  if (portalTitle) portalTitle.innerText = game.title.toUpperCase();
+  if (portalTip) portalTip.innerText = `Preparing 60 FPS WebGL Stage • ${game.controls || 'Ready Pilot'}`;
+
+  // Reset and restart progress bar animation
+  if (progressFill) {
+    progressFill.style.animation = 'none';
+    void progressFill.offsetWidth;
+    progressFill.style.animation = 'portalLoadFill 0.42s ease-out forwards';
+  }
+
+  // Show transition overlay
+  if (portal) portal.classList.remove('hidden');
+
+  if (transitionTimeout) clearTimeout(transitionTimeout);
+  transitionTimeout = setTimeout(() => {
+    // 1. Hide Lobby
+    if (lobbyView) {
+      lobbyView.classList.add('hidden');
+      lobbyView.classList.remove('active-view');
+    }
+
+    // 2. Hide Transition
+    if (portal) portal.classList.add('hidden');
+
+    // 3. Show Dedicated Game Arena
+    if (arenaView) {
+      arenaView.classList.remove('hidden');
+      arenaView.classList.add('active-view');
+    }
+
+    // 4. Update body state
+    document.body.classList.remove('state-lobby-active');
+    document.body.classList.add('state-game-active');
+
+    // 5. Launch Game and log history
+    launchGame(game);
+    recordRecentlyPlayed(game.id);
+  }, 440);
+}
+
+function returnToLobby() {
+  sound.playUiBeep(450, 'sine');
+
+  // 1. Destroy running game instance cleanly
+  if (appState.currentGameInstance && appState.currentGameInstance.destroy) {
+    appState.currentGameInstance.destroy();
+    appState.currentGameInstance = null;
+  }
+  appState.isGamePaused = false;
+
+  // 2. Exit fullscreen if active
+  if (document.fullscreenElement && document.exitFullscreen) {
+    document.exitFullscreen().catch(() => {});
+  }
+
+  // 3. Hide in-game overlays
+  const pauseOverlay = document.getElementById('game-pause-overlay');
+  const gameOverOverlay = document.getElementById('game-over-overlay');
+  if (pauseOverlay) pauseOverlay.classList.add('hidden');
+  if (gameOverOverlay) gameOverOverlay.classList.add('hidden');
+
+  // 4. Hide Game Arena
+  const arenaView = document.getElementById('view-game-arena');
+  if (arenaView) {
+    arenaView.classList.add('hidden');
+    arenaView.classList.remove('active-view');
+  }
+
+  // 5. Show Full-Screen Lobby
+  const lobbyView = document.getElementById('view-lobby');
+  if (lobbyView) {
+    lobbyView.classList.remove('hidden');
+    lobbyView.classList.add('active-view');
+  }
+
+  // 6. Set body state back to lobby
+  document.body.classList.remove('state-game-active');
+  document.body.classList.add('state-lobby-active');
+
+  // 7. Refresh recent list & scroll to top of lobby
+  renderRecentlyPlayed();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// -------------------------------------------------------------
+// 7. LAUNCH 3D GAME IN ARENA (PRESERVING ALL MECHANICS & SCORES)
 // -------------------------------------------------------------
 function formatControlsHint(hint) {
   if (!hint) {
-    return `<span class="kbd-badge">◀</span> <span class="kbd-badge">▶</span> Steer <span class="kbd-sep">•</span> <span class="kbd-badge">SPACE</span> Action <span class="kbd-sep">•</span> <span class="kbd-badge">P</span> Pause`;
+    return `<span class="kbd-badge">◀</span> <span class="kbd-badge">▶</span> Steer <span class="kbd-sep">•</span> <span class="kbd-badge">SPACE</span> Action <span class="kbd-sep">•</span> <span class="kbd-badge">P</span> Pause <span class="kbd-sep">•</span> <span class="kbd-badge">ESC</span> Lobby`;
   }
   return hint
     .replace(/(Left\/Right|Arrows|WASD)/gi, '<span class="kbd-badge">$1</span>')
     .replace(/(Space|Click|Tap|Drag|Enter)/gi, '<span class="kbd-badge">$1</span>')
-    + ` <span class="kbd-sep">•</span> <span class="kbd-badge">P</span> Pause`;
+    + ` <span class="kbd-sep">•</span> <span class="kbd-badge">P</span> Pause <span class="kbd-sep">•</span> <span class="kbd-badge">ESC</span> Lobby`;
 }
 
 function launchGame(game) {
-  sound.playUiBeep(700, 'sine');
   appState.activeGameData = game;
   appState.isGamePaused = false;
   appState.totalSessions++;
   localStorage.setItem('nexus3d_sessions', appState.totalSessions.toString());
 
-  const modal = document.getElementById('game-modal');
   const titleEl = document.getElementById('modal-game-title');
   const badgeEl = document.getElementById('modal-game-badge');
   const canvasContainer = document.getElementById('game-canvas-container');
@@ -243,15 +544,17 @@ function launchGame(game) {
   if (pauseOverlay) pauseOverlay.classList.add('hidden');
   if (gameOverOverlay) gameOverOverlay.classList.add('hidden');
 
-  modal.classList.remove('hidden');
-
   // Clean previous instance
   if (appState.currentGameInstance && appState.currentGameInstance.destroy) {
     appState.currentGameInstance.destroy();
     appState.currentGameInstance = null;
   }
 
-  // Wait for layout pass to ensure container clientWidth and clientHeight are accurate
+  if (canvasContainer) {
+    canvasContainer.innerHTML = '';
+  }
+
+  // Wait for layout pass so container dimensions are 100% computed
   requestAnimationFrame(() => {
     if (game.playableType === 'threejs-runner') {
       appState.currentGameInstance = new CyberRunner3DGame(
@@ -415,24 +718,8 @@ function onGameOverHandler(finalScore, bonus) {
   }, 250);
 }
 
-function closeGameModal() {
-  sound.playUiBeep(400, 'sine');
-  const modal = document.getElementById('game-modal');
-  const pauseOverlay = document.getElementById('game-pause-overlay');
-  const gameOverOverlay = document.getElementById('game-over-overlay');
-
-  if (modal) modal.classList.add('hidden');
-  if (pauseOverlay) pauseOverlay.classList.add('hidden');
-  if (gameOverOverlay) gameOverOverlay.classList.add('hidden');
-
-  if (appState.currentGameInstance && appState.currentGameInstance.destroy) {
-    appState.currentGameInstance.destroy();
-    appState.currentGameInstance = null;
-  }
-}
-
 // -------------------------------------------------------------
-// 4. SOCIAL HUB: LIVE CYBER CHAT & LEADERBOARDS
+// 8. SOCIAL HUB: LIVE CYBER CHAT & LEADERBOARDS
 // -------------------------------------------------------------
 function renderChat() {
   const container = document.getElementById('chat-messages-box');
@@ -440,7 +727,7 @@ function renderChat() {
 
   container.innerHTML = appState.chat.map((msg) => `
     <div class="chat-bubble">
-      <div class="chat-bubble-user" style="color: ${msg.color || 'var(--accent-cyan)'}">
+      <div class="chat-bubble-user" style="color: ${msg.color || 'var(--neon-blue)'}">
         <span>${msg.user}</span>
         <span style="color: var(--text-muted); font-size: 0.68rem;">${msg.time}</span>
       </div>
@@ -486,7 +773,7 @@ function initChatSystem() {
           user: 'Cyborg_Echo',
           text: randomReply,
           time: 'Just now',
-          color: '#00f3ff'
+          color: '#00f0ff'
         });
         sound.playUiBeep(500, 'sine');
         renderChat();
@@ -510,7 +797,7 @@ function initChatSystem() {
       user: randName,
       text: randText,
       time: 'Just now',
-      color: '#ff007f'
+      color: '#a855f7'
     });
     if (appState.chat.length > 25) appState.chat.shift();
     renderChat();
@@ -531,7 +818,7 @@ function renderLeaderboard() {
           <div style="font-size: 0.68rem; color: var(--text-muted);">${item.badge}</div>
         </div>
       </div>
-      <div style="font-family: var(--font-display); font-weight: 700; color: var(--accent-cyan);">
+      <div style="font-family: var(--font-title); font-weight: 700; color: var(--neon-blue);">
         ${item.score.toLocaleString()} PTS
       </div>
     </div>
@@ -565,7 +852,7 @@ function submitScoreToLeaderboard(score) {
 }
 
 // -------------------------------------------------------------
-// 5. COINS & REWARDS SYSTEM
+// 9. COINS & REWARDS SYSTEM
 // -------------------------------------------------------------
 function addCoins(amount) {
   appState.userCoins += amount;
@@ -581,13 +868,12 @@ function updateCoinsDisplay() {
 }
 
 // -------------------------------------------------------------
-// 6. APK EXPORT & DOWNLOAD HANDLER
+// 10. APK EXPORT & DOWNLOAD HANDLER
 // -------------------------------------------------------------
 function initApkModal() {
   const modal = document.getElementById('apk-modal');
   const openBtn = document.getElementById('open-apk-modal-btn');
   const closeBtn = document.getElementById('apk-close-btn');
-  const directDownloadBtn = document.getElementById('direct-apk-download-btn');
   const pwaInstallBtn = document.getElementById('pwa-install-trigger-btn');
 
   if (openBtn) {
@@ -623,7 +909,7 @@ function initApkModal() {
 }
 
 // -------------------------------------------------------------
-// 7. INITIALIZE APPLICATION & ROUTING
+// 11. INITIALIZE APPLICATION & EVENT BUS
 // -------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
   // Sound Toggle
@@ -631,12 +917,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (audioBtn) {
     audioBtn.addEventListener('click', () => {
       const isMuted = sound.toggleMute();
-      audioBtn.innerText = isMuted ? '🔇 MUTED' : '🎵 SOUND';
-      audioBtn.style.color = isMuted ? 'var(--neon-magenta)' : 'var(--neon-cyan)';
+      audioBtn.innerText = isMuted ? '🔇' : '🎵';
+      audioBtn.style.color = isMuted ? 'var(--neon-purple)' : 'var(--neon-blue)';
     });
   }
 
-  // Brand click returns to top
+  // Brand click returns to top of lobby
   const brandHome = document.getElementById('brand-home-btn');
   if (brandHome) {
     brandHome.addEventListener('click', () => {
@@ -648,8 +934,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const quickPlayBtn = document.getElementById('hero-quick-play-btn');
   if (quickPlayBtn) {
     quickPlayBtn.addEventListener('click', () => {
-      const runner = appState.games.find((g) => g.id === 'cyber-runner-3d');
-      if (runner) launchGame(runner);
+      const runner = appState.games.find((g) => g.id === 'cyber-runner-3d') || appState.games[0];
+      if (runner) startTransitionToGame(runner);
+    });
+  }
+
+  // Hero Browse Vault Link
+  const browseVaultBtn = document.getElementById('hero-browse-vault-btn');
+  if (browseVaultBtn) {
+    browseVaultBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const vaultSec = document.getElementById('vault-section');
+      if (vaultSec) vaultSec.scrollIntoView({ behavior: 'smooth' });
     });
   }
 
@@ -674,14 +970,22 @@ document.addEventListener('DOMContentLoaded', () => {
   if (dailyQuestBtn) dailyQuestBtn.addEventListener('click', claimDailyReward);
   if (dailyQuestTrigger) dailyQuestTrigger.addEventListener('click', claimDailyReward);
 
-  // Modern Nav Pills
-  const navPills = document.querySelectorAll('.nav-pill');
-  navPills.forEach((pill) => {
+  // Sync Category Filter Pills (both Header nav and Vault bar)
+  const allNavPills = document.querySelectorAll('.header-center-nav .nav-pill, .vault-categories-row .cat-pill');
+  allNavPills.forEach((pill) => {
     pill.addEventListener('click', () => {
-      navPills.forEach((p) => p.classList.remove('active'));
-      pill.classList.add('active');
-      appState.activeFilter = pill.dataset.filter;
+      const filter = pill.dataset.filter;
+      appState.activeFilter = filter;
       sound.playUiBeep(500, 'sine');
+
+      allNavPills.forEach((p) => {
+        if (p.dataset.filter === filter) {
+          p.classList.add('active');
+        } else {
+          p.classList.remove('active');
+        }
+      });
+
       renderGamesCatalog();
     });
   });
@@ -692,6 +996,17 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.addEventListener('input', (e) => {
       appState.searchQuery = e.target.value.trim();
       renderGamesCatalog();
+    });
+  }
+
+  // Clear Recent History
+  const clearRecentBtn = document.getElementById('clear-recent-btn');
+  if (clearRecentBtn) {
+    clearRecentBtn.addEventListener('click', () => {
+      sound.playUiBeep(400, 'sine');
+      appState.recentGames = [];
+      localStorage.removeItem('nexus3d_recent_games');
+      renderRecentlyPlayed();
     });
   }
 
@@ -737,9 +1052,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (closeLbDrawer) closeLbDrawer.addEventListener('click', hideLbDrawer);
   if (lbBackdrop) lbBackdrop.addEventListener('click', hideLbDrawer);
 
-  // Game Modal Controls & Overlays
-  const closeGameModalBtn = document.getElementById('close-game-modal-btn');
-  const gameExitBtn = document.getElementById('game-exit-btn');
+  // Dedicated Game Arena Controls & Navigation
+  const backToLobbyBtn = document.getElementById('back-to-lobby-btn');
   const gameRestartBtn = document.getElementById('game-restart-btn');
   const hudPauseBtn = document.getElementById('hud-pause-btn');
   const pauseResumeBtn = document.getElementById('pause-resume-btn');
@@ -750,48 +1064,50 @@ document.addEventListener('DOMContentLoaded', () => {
   const gameAudioToolBtn = document.getElementById('game-audio-tool-btn');
   const gameFullscreenToolBtn = document.getElementById('game-fullscreen-tool-btn');
 
-  if (closeGameModalBtn) closeGameModalBtn.addEventListener('click', closeGameModal);
-  if (gameExitBtn) gameExitBtn.addEventListener('click', closeGameModal);
+  // Back to Lobby button
+  if (backToLobbyBtn) backToLobbyBtn.addEventListener('click', returnToLobby);
+  if (pauseExitBtn) pauseExitBtn.addEventListener('click', returnToLobby);
+  if (gameoverExitBtn) gameoverExitBtn.addEventListener('click', returnToLobby);
+
+  // Restart buttons
   if (gameRestartBtn) {
     gameRestartBtn.addEventListener('click', () => {
       if (appState.activeGameData) launchGame(appState.activeGameData);
     });
   }
-
-  if (hudPauseBtn) hudPauseBtn.addEventListener('click', toggleGamePause);
-  if (pauseResumeBtn) pauseResumeBtn.addEventListener('click', resumeGame);
   if (pauseRestartBtn) {
     pauseRestartBtn.addEventListener('click', () => {
       if (appState.activeGameData) launchGame(appState.activeGameData);
     });
   }
-  if (pauseExitBtn) pauseExitBtn.addEventListener('click', closeGameModal);
-
   if (gameoverRestartBtn) {
     gameoverRestartBtn.addEventListener('click', () => {
       if (appState.activeGameData) launchGame(appState.activeGameData);
     });
   }
-  if (gameoverExitBtn) gameoverExitBtn.addEventListener('click', closeGameModal);
 
-  // In-Game Audio Toggle Tool
+  // Pause / Resume buttons
+  if (hudPauseBtn) hudPauseBtn.addEventListener('click', toggleGamePause);
+  if (pauseResumeBtn) pauseResumeBtn.addEventListener('click', resumeGame);
+
+  // In-Game Audio Toggle
   if (gameAudioToolBtn) {
     gameAudioToolBtn.addEventListener('click', () => {
       const isMuted = sound.toggleMute();
       gameAudioToolBtn.innerText = isMuted ? '🔇 Muted' : '🎵 Sound';
-      gameAudioToolBtn.style.color = isMuted ? 'var(--neon-pink)' : 'var(--neon-blue)';
+      gameAudioToolBtn.style.color = isMuted ? 'var(--neon-purple)' : 'var(--neon-blue)';
       const mainAudioBtn = document.getElementById('audio-toggle-btn');
       if (mainAudioBtn) {
-        mainAudioBtn.innerText = isMuted ? '🔇 MUTED' : '🎵 SOUND';
-        mainAudioBtn.style.color = isMuted ? 'var(--neon-magenta)' : 'var(--neon-cyan)';
+        mainAudioBtn.innerText = isMuted ? '🔇' : '🎵';
+        mainAudioBtn.style.color = isMuted ? 'var(--neon-purple)' : 'var(--neon-blue)';
       }
     });
   }
 
-  // In-Game Fullscreen Toggle Tool
+  // In-Game Fullscreen Toggle
   if (gameFullscreenToolBtn) {
     gameFullscreenToolBtn.addEventListener('click', () => {
-      const arena = document.getElementById('game-arena-wrapper');
+      const arena = document.getElementById('view-game-arena');
       if (!document.fullscreenElement) {
         if (arena && arena.requestFullscreen) {
           arena.requestFullscreen().catch(() => {});
@@ -806,10 +1122,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Global In-Game Keyboard Shortcuts (Pause, Escape, Space to Restart)
+  // Keyboard Shortcuts (P = Pause, ESC = Return to Lobby, Space = Restart after Game Over)
   window.addEventListener('keydown', (e) => {
-    const gameModal = document.getElementById('game-modal');
-    if (!gameModal || gameModal.classList.contains('hidden')) return;
+    const arenaView = document.getElementById('view-game-arena');
+    if (!arenaView || arenaView.classList.contains('hidden')) return;
 
     const gameOverOverlay = document.getElementById('game-over-overlay');
     const isGameOver = gameOverOverlay && !gameOverOverlay.classList.contains('hidden');
@@ -819,15 +1135,17 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleGamePause();
       }
     } else if (e.key === 'Escape') {
-      closeGameModal();
+      returnToLobby();
     } else if (e.key === ' ' && isGameOver) {
       e.preventDefault();
       if (appState.activeGameData) launchGame(appState.activeGameData);
     }
   });
 
-  // Setup Isolated Admin Panel
+  // Setup Admin Panel
   const adminPanel = new AdminControlPanel(appState, () => {
+    renderFeaturedGames();
+    renderRecentlyPlayed();
     renderGamesCatalog();
     updateCoinsDisplay();
     const banner = document.getElementById('announcement-banner');
@@ -845,14 +1163,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Keyboard Shortcut for Admin Access: Ctrl + Shift + A
+  // Admin Shortcut: Ctrl + Shift + A
   window.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
       adminPanel.open();
     }
   });
 
-  // Check URL Hash for #admin
   if (window.location.hash === '#admin') {
     adminPanel.open();
   }
@@ -862,8 +1179,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Init Hero 3D background & modules
+  // Init Lobby Canvas, 3D Hero, and Sections
+  initLobbyAmbient();
   initHero3D();
+  renderFeaturedGames();
+  renderRecentlyPlayed();
   renderGamesCatalog();
   renderLeaderboard();
   initChatSystem();

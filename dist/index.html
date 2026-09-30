@@ -3,119 +3,335 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NEXUS 3D | Compact Modern Cyber Arcade</title>
-  <meta name="description" content="Next-generation compact 3D gaming hub. 20 cyber games, real-time servers, global leaderboards and Android APK ready.">
+  <title>NEXUS 3D | Cyber Arcade Gaming Launcher</title>
+  <meta name="description" content="Next-generation AAA cyber arcade gaming launcher. 20 high-speed 3D WebGL games, real-time leaderboards, social chat, and instant native play.">
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#00f3ff">
   <link rel="icon" type="image/jpeg" href="/app-icon.jpg">
-  <script type="module" crossorigin src="/assets/index-TrI-rYRT.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-Bp5zZZtn.css">
+  <script type="module" crossorigin src="/assets/index-ubSKqSvh.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-ZSQwX6Tp.css">
 </head>
-<body>
+<body class="state-lobby-active">
 
-  <!-- ================= COMPACT MODERN APP HEADER ================= -->
-  <header class="app-header">
-    <div class="brand-box" id="brand-home-btn">
-      <img src="/app-icon.jpg" alt="Nexus 3D Logo" class="brand-icon">
-      <div class="brand-name">NEXUS<span>3D</span></div>
-    </div>
+  <!-- ================= STATE 1: FULL-SCREEN ANIMATED LOBBY LAUNCHER ================= -->
+  <div id="view-lobby" class="view-screen lobby-screen active-view">
+    <!-- Ambient 3D Cyber Grid & Particle Canvas -->
+    <canvas id="lobby-ambient-canvas" class="lobby-ambient-canvas"></canvas>
 
-    <!-- Center Category Navigation Pills -->
-    <nav class="header-center-nav">
-      <button class="nav-pill active" data-filter="all">All (20)</button>
-      <button class="nav-pill" data-filter="action">Action</button>
-      <button class="nav-pill" data-filter="shooter">Shooters</button>
-      <button class="nav-pill" data-filter="racing">Racing</button>
-      <button class="nav-pill" data-filter="puzzle">Puzzles</button>
-    </nav>
-
-    <!-- Right Quick Actions -->
-    <div class="header-right">
-      <div class="chip-status">
-        <span class="pulse-dot"></span>
-        <span>1.4k Online</span>
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+      <div class="brand-box" id="brand-home-btn">
+        <img src="/app-icon.jpg" alt="Nexus 3D Logo" class="brand-icon">
+        <div class="brand-name">NEXUS<span>3D</span></div>
       </div>
 
-      <div class="chip-coins">
-        <span>🪙</span>
-        <span id="player-coins-val">2,500</span>
+      <!-- Quick Category Nav Pills -->
+      <nav class="header-center-nav">
+        <button class="nav-pill active" data-filter="all">All (20)</button>
+        <button class="nav-pill" data-filter="action">Action</button>
+        <button class="nav-pill" data-filter="shooter">Shooters</button>
+        <button class="nav-pill" data-filter="racing">Racing</button>
+        <button class="nav-pill" data-filter="puzzle">Puzzles</button>
+      </nav>
+
+      <!-- Right Quick Actions -->
+      <div class="header-right">
+        <div class="chip-status">
+          <span class="pulse-dot"></span>
+          <span>1.4k Online</span>
+        </div>
+
+        <div class="chip-coins">
+          <span>🪙</span>
+          <span id="player-coins-val">2,500</span>
+        </div>
+
+        <button class="btn-icon" id="audio-toggle-btn" title="Toggle Sound FX">
+          🎵
+        </button>
+
+        <button class="btn-icon" id="toggle-chat-btn" title="Open Global Cyber Chat">
+          💬
+        </button>
+
+        <button class="btn-icon" id="toggle-lb-btn" title="Open Global Leaderboard">
+          🏆
+        </button>
+
+        <button class="btn-apk-compact" id="open-apk-modal-btn">
+          📲 Get App
+        </button>
       </div>
+    </header>
 
-      <button class="btn-icon" id="audio-toggle-btn" title="Toggle Sound FX">
-        🎵
-      </button>
-
-      <!-- Drawers Toggles -->
-      <button class="btn-icon" id="toggle-chat-btn" title="Open Global Chat">
-        💬
-      </button>
-
-      <button class="btn-icon" id="toggle-lb-btn" title="Open Leaderboard">
-        🏆
-      </button>
-
-      <!-- Compact APK Download -->
-      <button class="btn-apk-compact" id="open-apk-modal-btn">
-        📲 Get App
-      </button>
+    <!-- Slim Dynamic Announcement Ticker -->
+    <div class="compact-ticker" id="announcement-banner">
+      <div class="ticker-content">
+        <span class="ticker-tag">LIVE</span>
+        <span>Season 1 Cyber Championship is LIVE! Win 50,000 Cyber Coins!</span>
+      </div>
+      <div style="font-size: 0.72rem; color: var(--neon-blue); cursor: pointer;" id="daily-quest-trigger">
+        🎁 Claim Daily +500 🪙
+      </div>
     </div>
-  </header>
 
-  <!-- Slim Dynamic Announcement Ticker -->
-  <div class="compact-ticker" id="announcement-banner">
-    <div class="ticker-content">
-      <span class="ticker-tag">LIVE</span>
-      <span>Season 1 Cyber Championship is LIVE! Win 50,000 Cyber Coins!</span>
-    </div>
-    <div style="font-size: 0.72rem; color: var(--neon-blue); cursor: pointer;" id="daily-quest-trigger">
-      🎁 Claim Daily +500 🪙
+    <!-- Main Scrollable Lobby Content -->
+    <main class="main-layout lobby-content-flow">
+
+      <!-- ================= HERO AAA ARCADE LAUNCHER SPOTLIGHT ================= -->
+      <section class="spotlight-card lobby-hero-card">
+        <div class="spotlight-bg" style="background-image: url('/hero-banner.jpg');"></div>
+        <div class="spotlight-overlay"></div>
+        <canvas id="hero-bg-canvas" class="spotlight-canvas"></canvas>
+
+        <div class="spotlight-content">
+          <div class="spotlight-badge-row">
+            <span class="spotlight-badge">★ FEATURED 3D SPOTLIGHT</span>
+            <span class="spotlight-badge spotlight-badge-purple">60 FPS WEBGL</span>
+          </div>
+          <h1 class="spotlight-title">CYBER RUNNER: <span>PULSE 3D</span></h1>
+          <p class="spotlight-desc">
+            Sprint across lightspeed neon highways, dodge quantum laser barriers, and claim high-value energy cores at 60 FPS WebGL. Instant full-screen action.
+          </p>
+
+          <div class="spotlight-actions">
+            <button class="btn-play-spotlight" id="hero-quick-play-btn">
+              ⚡ ENTER ARCADE / PLAY NOW
+            </button>
+            <button class="btn-reward-compact" id="hero-daily-quest-btn">
+              🎁 Claim +500 🪙
+            </button>
+            <a href="#vault-section" class="btn-browse-vault" id="hero-browse-vault-btn">
+              🕹️ Browse All Games
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 1: 🌟 FEATURED 3D GAMES ================= -->
+      <section class="lobby-section" id="featured-section">
+        <div class="section-heading-row">
+          <div class="heading-left">
+            <span class="section-tag-badge">TOP PICKS</span>
+            <h2 class="section-heading-title">🌟 Featured 3D Cyber Titles</h2>
+          </div>
+          <span class="section-subtitle">Real-time WebGL Engine • Hardware Accelerated</span>
+        </div>
+        <div class="featured-games-grid" id="featured-games-container">
+          <!-- Dynamically injected featured games -->
+        </div>
+      </section>
+
+      <!-- ================= SECTION 2: ⏱️ RECENTLY PLAYED ================= -->
+      <section class="lobby-section" id="recently-played-section">
+        <div class="section-heading-row">
+          <div class="heading-left">
+            <span class="section-tag-badge section-tag-purple">MISSION HISTORY</span>
+            <h2 class="section-heading-title">⏱️ Recently Played</h2>
+          </div>
+          <button class="btn-clear-recent" id="clear-recent-btn">Clear History</button>
+        </div>
+        <div class="recent-games-grid" id="recent-games-container">
+          <!-- Dynamically injected from localStorage -->
+        </div>
+      </section>
+
+      <!-- ================= SECTION 3: 🎮 ALL GAMES VAULT & SEARCH ================= -->
+      <section class="lobby-section" id="vault-section">
+        <div class="vault-bar">
+          <div class="vault-title-group">
+            <span class="section-tag-badge section-tag-cyan">FULL ARCHIVE</span>
+            <h2 class="vault-heading">🎮 Games Vault</h2>
+            <span class="vault-count" id="stat-total-games">20 Games</span>
+          </div>
+          <div class="vault-search-box">
+            <span style="font-size: 0.8rem; color: var(--neon-blue);">🔍</span>
+            <input type="text" id="game-search-input" class="vault-search-input" placeholder="Search 3D games..." autocomplete="off">
+          </div>
+        </div>
+
+        <!-- Filter navigation bar -->
+        <div class="vault-categories-row">
+          <button class="cat-pill active" data-filter="all">All Games (20)</button>
+          <button class="cat-pill" data-filter="action">Action & Mecha</button>
+          <button class="cat-pill" data-filter="shooter">Space Shooters</button>
+          <button class="cat-pill" data-filter="racing">Hyperspace Racing</button>
+          <button class="cat-pill" data-filter="puzzle">Cyber Puzzles</button>
+        </div>
+
+        <!-- High-Density 20 Games Grid -->
+        <div class="games-grid" id="games-grid-container">
+          <!-- Injected dynamically from gamesData.js -->
+        </div>
+      </section>
+
+      <!-- ================= COMPACT FOOTER ================= -->
+      <footer class="app-footer">
+        <div>© 2026 Nexus 3D Labs • 20 Games • WebGL 60FPS • Android APK Ready</div>
+        <div>
+          <a href="#admin" id="discrete-admin-link" class="discrete-operator-link">
+            🔒 Operator Console (PIN: 7777)
+          </a>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- ================= STATE 2: HYPERSPACE WARP TRANSITION PORTAL ================= -->
+  <div id="view-portal-transition" class="portal-transition-overlay hidden">
+    <div class="portal-warp-grid"></div>
+    <div class="portal-content">
+      <div class="portal-spinner">
+        <div class="portal-ring portal-ring-outer"></div>
+        <div class="portal-ring portal-ring-inner"></div>
+        <div class="portal-core">⚡</div>
+      </div>
+      <div class="portal-status-text">INITIALIZING NEURAL LINK...</div>
+      <h2 class="portal-game-name" id="portal-game-title">CYBER RUNNER 3D</h2>
+      <div class="portal-progress-bar">
+        <div class="portal-progress-fill" id="portal-progress-fill"></div>
+      </div>
+      <div class="portal-tip" id="portal-game-tip">Entering 60 FPS WebGL Engine...</div>
     </div>
   </div>
 
-  <!-- ================= MAIN CONTENT LAYOUT ================= -->
-  <main class="main-layout">
+  <!-- ================= STATE 3: DEDICATED FULL-SCREEN GAME ARENA ================= -->
+  <div id="view-game-arena" class="view-screen game-arena-fullscreen hidden">
+    <!-- Top Game Navigation Bar -->
+    <header class="game-top-bar">
+      <button class="btn-back-to-lobby" id="back-to-lobby-btn" title="Return to Launcher Lobby (Esc)">
+        <span class="back-arrow">⬅</span>
+        <span class="back-text">BACK TO LOBBY</span>
+      </button>
 
-    <!-- Compact Modern Spotlight Card (Neo-Tokyo Arcade Portal) -->
-    <section class="spotlight-card">
-      <div class="spotlight-bg" style="background-image: url('/hero-banner.jpg');"></div>
-      <div class="spotlight-overlay"></div>
-      <canvas id="hero-bg-canvas" class="spotlight-canvas"></canvas>
+      <div class="game-top-title-group">
+        <span class="game-header-badge" id="modal-game-badge">3D ACTION</span>
+        <h2 class="game-top-title" id="modal-game-title">Cyber Runner 3D</h2>
+        <span class="game-fps-tag">60 FPS</span>
+      </div>
 
-      <div class="spotlight-content">
-        <span class="spotlight-badge">FEATURED 3D SPOTLIGHT</span>
-        <h1 class="spotlight-title">CYBER RUNNER: <span>PULSE 3D</span></h1>
-        <p class="spotlight-desc">
-          Sprint across lightspeed neon highways, dodge quantum laser barriers, and claim high-value energy cores at 60 FPS WebGL.
-        </p>
+      <div class="game-top-tools">
+        <button class="btn-game-tool" id="game-audio-tool-btn" title="Toggle Sound (M)">🎵 Sound</button>
+        <button class="btn-game-tool" id="game-fullscreen-tool-btn" title="Toggle Fullscreen (F)">⛶ Maximize</button>
+        <button class="btn-game-tool" id="game-restart-btn" title="Restart Game (R)">🔄 Restart</button>
+      </div>
+    </header>
 
-        <div class="spotlight-actions">
-          <button class="btn-play-spotlight" id="hero-quick-play-btn">
-            ⚡ Play Now (3D)
-          </button>
-          <button class="btn-reward-compact" id="hero-daily-quest-btn">
-            🎁 Daily Reward (+500 🪙)
+    <!-- Full-Screen Viewport Stage (No Background Lobby Rendered) -->
+    <div class="game-arena-stage" id="game-arena-stage">
+      <div id="game-canvas-container" class="game-canvas-container"></div>
+
+      <!-- In-Game High-Tech Cyber HUD Bar -->
+      <div class="game-hud-overlay">
+        <div class="hud-left-stats">
+          <div class="hud-chip hud-chip-cyan">
+            <span class="hud-label">SCORE</span>
+            <span class="hud-value" id="hud-score-val">0</span>
+          </div>
+          <div class="hud-chip hud-chip-purple">
+            <span class="hud-label">BEST</span>
+            <span class="hud-value" id="hud-best-val">0</span>
+          </div>
+        </div>
+
+        <div class="hud-center-stats">
+          <div class="hud-chip hud-chip-gold">
+            <span class="hud-label" id="hud-sub-label">REWARD</span>
+            <span class="hud-value" id="hud-sub-val">0 🪙</span>
+          </div>
+        </div>
+
+        <div class="hud-right-stats">
+          <button class="hud-icon-btn" id="hud-pause-btn" title="Pause Game (P)">
+            ⏸️
           </button>
         </div>
       </div>
-    </section>
 
-    <!-- Compact Games Vault Bar with Live Search -->
-    <div class="vault-bar">
-      <div class="vault-title-group">
-        <h2 class="vault-heading">Games Vault</h2>
-        <span class="vault-count" id="stat-total-games">20 Games</span>
+      <!-- Ergonomic Mobile Touch Controls (Hidden on Desktop) -->
+      <div class="touch-controls-bar" id="touch-controls-bar">
+        <div class="touch-cluster-left">
+          <button class="touch-btn touch-btn-dir" id="touch-left-btn" aria-label="Steer Left">◀</button>
+          <button class="touch-btn touch-btn-dir" id="touch-right-btn" aria-label="Steer Right">▶</button>
+        </div>
+        <div class="touch-cluster-right">
+          <button class="touch-btn touch-btn-action" id="touch-action-btn" aria-label="Action / Fire / Jump">⚡ ACTION</button>
+        </div>
       </div>
-      <div class="vault-search-box">
-        <span style="font-size: 0.8rem; color: var(--neon-blue);">🔍</span>
-        <input type="text" id="game-search-input" class="vault-search-input" placeholder="Search 3D games..." autocomplete="off">
+
+      <!-- In-Game Pause Overlay -->
+      <div class="game-state-overlay hidden" id="game-pause-overlay">
+        <div class="game-state-card">
+          <div class="game-state-icon">⏸️</div>
+          <h3 class="game-state-title">SYSTEM PAUSED</h3>
+          <p class="game-state-subtitle" id="pause-game-name">Cyber Runner 3D</p>
+          <div class="game-state-buttons">
+            <button class="btn-state-action btn-state-primary" id="pause-resume-btn">
+              ▶ Resume Game (Space)
+            </button>
+            <button class="btn-state-action" id="pause-restart-btn">
+              🔄 Restart Game
+            </button>
+            <button class="btn-state-action btn-state-exit" id="pause-exit-btn">
+              🚪 Return to Lobby
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- In-Game Mission Complete / Game Over Overlay -->
+      <div class="game-state-overlay hidden" id="game-over-overlay">
+        <div class="game-state-card">
+          <div class="game-state-badge" id="game-over-badge">MISSION COMPLETE</div>
+          <h3 class="game-state-title" id="game-over-title">CYBER RUNNER 3D</h3>
+          
+          <div class="game-stats-grid">
+            <div class="stat-box">
+              <span class="stat-label">FINAL SCORE</span>
+              <span class="stat-val stat-neon-cyan" id="game-over-score">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">COINS EARNED</span>
+              <span class="stat-val stat-neon-gold" id="game-over-coins">+0 🪙</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">BEST RECORD</span>
+              <span class="stat-val stat-neon-purple" id="game-over-best">0</span>
+            </div>
+          </div>
+
+          <div class="new-record-alert hidden" id="new-record-alert">
+            🏆 NEW HIGH SCORE RECORD!
+          </div>
+
+          <div class="game-state-buttons">
+            <button class="btn-state-action btn-state-primary" id="gameover-restart-btn">
+              ⚡ Play Again (Space)
+            </button>
+            <button class="btn-state-action btn-state-exit" id="gameover-exit-btn">
+              🚪 Return to Lobby
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- High-Density Compact 20 Games Grid -->
-    <div class="games-grid" id="games-grid-container">
-      <!-- Injected dynamically from gamesData.js -->
-    </div>
-  </main>
+    <!-- Arena Bottom Controls Bar -->
+    <footer class="game-bottom-bar">
+      <div class="game-keyboard-legend" id="game-controls-hint">
+        <span class="kbd-badge">◀</span> <span class="kbd-badge">▶</span> Steer
+        <span class="kbd-sep">•</span>
+        <span class="kbd-badge">SPACE</span> Action / Jump
+        <span class="kbd-sep">•</span>
+        <span class="kbd-badge">P</span> Pause
+        <span class="kbd-sep">•</span>
+        <span class="kbd-badge">ESC</span> Lobby
+      </div>
+      <div class="game-bottom-status">
+        <span class="ping-dot"></span> <span>60 FPS WebGL Engine Active</span>
+      </div>
+    </footer>
+  </div>
 
   <!-- ================= SLIDE-OUT CHAT DRAWER ================= -->
   <div class="drawer-backdrop" id="chat-drawer-backdrop"></div>
@@ -146,138 +362,6 @@
       <!-- Leaderboard items rendered dynamically -->
     </div>
   </aside>
-
-  <!-- ================= COMPACT 3D GAME ARENA MODAL ================= -->
-  <div class="modal-overlay hidden" id="game-modal">
-    <div class="modal-content game-modal-content">
-      <!-- Game Modal Header -->
-      <div class="game-modal-header">
-        <div class="game-header-info">
-          <span class="game-header-badge" id="modal-game-badge">3D ACTION</span>
-          <h3 class="game-header-title" id="modal-game-title">Cyber Runner 3D</h3>
-        </div>
-        <div class="game-header-actions">
-          <button class="btn-game-tool" id="game-audio-tool-btn" title="Toggle Audio (M)">🎵 Sound</button>
-          <button class="btn-game-tool" id="game-fullscreen-tool-btn" title="Fullscreen (F)">⛶ Maximize</button>
-          <button class="btn-game-tool btn-game-close" id="close-game-modal-btn" title="Close Arena (Esc)">&times;</button>
-        </div>
-      </div>
-
-      <!-- Centered 3D Game Arena Stage -->
-      <div class="game-arena-wrapper" id="game-arena-wrapper">
-        <div id="game-canvas-container" class="game-canvas-container"></div>
-
-        <!-- In-Game High-Tech Cyber HUD Bar -->
-        <div class="game-hud-overlay">
-          <div class="hud-left-stats">
-            <div class="hud-chip hud-chip-cyan">
-              <span class="hud-label">SCORE</span>
-              <span class="hud-value" id="hud-score-val">0</span>
-            </div>
-            <div class="hud-chip hud-chip-purple">
-              <span class="hud-label">BEST</span>
-              <span class="hud-value" id="hud-best-val">0</span>
-            </div>
-          </div>
-
-          <div class="hud-center-stats">
-            <div class="hud-chip hud-chip-gold">
-              <span class="hud-label" id="hud-sub-label">REWARD</span>
-              <span class="hud-value" id="hud-sub-val">0 🪙</span>
-            </div>
-          </div>
-
-          <div class="hud-right-stats">
-            <button class="hud-icon-btn" id="hud-pause-btn" title="Pause Game (P)">
-              ⏸️
-            </button>
-          </div>
-        </div>
-
-        <!-- Ergonomic Mobile Touch Controls (Hidden on Desktop) -->
-        <div class="touch-controls-bar" id="touch-controls-bar">
-          <div class="touch-cluster-left">
-            <button class="touch-btn touch-btn-dir" id="touch-left-btn" aria-label="Steer Left">◀</button>
-            <button class="touch-btn touch-btn-dir" id="touch-right-btn" aria-label="Steer Right">▶</button>
-          </div>
-          <div class="touch-cluster-right">
-            <button class="touch-btn touch-btn-action" id="touch-action-btn" aria-label="Action / Fire / Jump">⚡ ACTION</button>
-          </div>
-        </div>
-
-        <!-- In-Game Pause Overlay -->
-        <div class="game-state-overlay hidden" id="game-pause-overlay">
-          <div class="game-state-card">
-            <div class="game-state-icon">⏸️</div>
-            <h3 class="game-state-title">SYSTEM PAUSED</h3>
-            <p class="game-state-subtitle" id="pause-game-name">Cyber Runner 3D</p>
-            <div class="game-state-buttons">
-              <button class="btn-state-action btn-state-primary" id="pause-resume-btn">
-                ▶ Resume Game (Space)
-              </button>
-              <button class="btn-state-action" id="pause-restart-btn">
-                🔄 Restart Game
-              </button>
-              <button class="btn-state-action btn-state-exit" id="pause-exit-btn">
-                🚪 Exit to Lobby
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- In-Game Mission Complete / Game Over Overlay -->
-        <div class="game-state-overlay hidden" id="game-over-overlay">
-          <div class="game-state-card">
-            <div class="game-state-badge" id="game-over-badge">MISSION COMPLETE</div>
-            <h3 class="game-state-title" id="game-over-title">CYBER RUNNER 3D</h3>
-            
-            <div class="game-stats-grid">
-              <div class="stat-box">
-                <span class="stat-label">FINAL SCORE</span>
-                <span class="stat-val stat-neon-cyan" id="game-over-score">0</span>
-              </div>
-              <div class="stat-box">
-                <span class="stat-label">COINS EARNED</span>
-                <span class="stat-val stat-neon-gold" id="game-over-coins">+0 🪙</span>
-              </div>
-              <div class="stat-box">
-                <span class="stat-label">BEST RECORD</span>
-                <span class="stat-val stat-neon-purple" id="game-over-best">0</span>
-              </div>
-            </div>
-
-            <div class="new-record-alert hidden" id="new-record-alert">
-              🏆 NEW HIGH SCORE RECORD!
-            </div>
-
-            <div class="game-state-buttons">
-              <button class="btn-state-action btn-state-primary" id="gameover-restart-btn">
-                ⚡ Play Again (Space)
-              </button>
-              <button class="btn-state-action btn-state-exit" id="gameover-exit-btn">
-                🚪 Return to Lobby
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Game Modal Footer -->
-      <div class="game-modal-footer">
-        <div class="game-keyboard-legend" id="game-controls-hint">
-          <span class="kbd-badge">◀</span> <span class="kbd-badge">▶</span> Steer
-          <span class="kbd-sep">•</span>
-          <span class="kbd-badge">SPACE</span> Fire / Jump
-          <span class="kbd-sep">•</span>
-          <span class="kbd-badge">P</span> Pause
-        </div>
-        <div class="game-footer-actions">
-          <button class="btn-game-footer" id="game-restart-btn">🔄 Restart</button>
-          <button class="btn-game-footer btn-game-exit" id="game-exit-btn">🚪 Exit</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- ================= APK & PWA MODAL ================= -->
   <div class="modal-overlay hidden" id="apk-modal">
@@ -402,16 +486,6 @@
       </div>
     </div>
   </div>
-
-  <!-- ================= COMPACT FOOTER ================= -->
-  <footer class="app-footer">
-    <div>© 2026 Nexus 3D Labs • 20 Games • WebGL 60FPS • Android APK Ready</div>
-    <div>
-      <a href="#admin" id="discrete-admin-link" class="discrete-operator-link">
-        🔒 Operator Console (PIN: 7777)
-      </a>
-    </div>
-  </footer>
 
   <!-- Main JavaScript bundle entry point -->
 </body>

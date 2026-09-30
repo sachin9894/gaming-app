@@ -160,6 +160,28 @@ class SoundFXEngine {
     } catch (e) {}
   }
 
+  // Hyperspace Portal Warp Sound
+  playWarp() {
+    if (this.muted) return;
+    this.init();
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(160, now);
+      osc.frequency.exponentialRampToValueAtTime(1400, now + 0.35);
+
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.4);
+    } catch (e) {}
+  }
+
   // Level Win / Achievement Fanfare
   playVictory() {
     if (this.muted) return;
