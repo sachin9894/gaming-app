@@ -226,7 +226,7 @@ function renderFeaturedGames() {
       <div class="featured-game-card ${isEnabled ? '' : 'disabled-game'}" data-game-id="${game.id}">
         <div class="featured-card-cover-wrap">
           <img src="${coverImg}" class="featured-card-img" alt="${game.title}" loading="lazy">
-          <span class="featured-card-badge">${game.badge || '3D WEBGL'}</span>
+          <span class="featured-card-badge">${game.badge || 'WEBGL'}</span>
           <span class="featured-card-fps">60 FPS</span>
         </div>
         <div class="featured-card-body">
@@ -270,7 +270,7 @@ function renderRecentlyPlayed() {
   if (recentList.length === 0) {
     container.innerHTML = `
       <div class="recent-empty-card">
-        <span>🎮 No recent missions logged yet. Launch any 3D title below to start playing!</span>
+        <span>🎮 No recent missions logged yet. Launch any title below to start playing!</span>
       </div>
     `;
     return;
@@ -362,7 +362,7 @@ function renderGamesCatalog() {
           <div class="game-card-footer">
             <span class="game-card-rating">⭐ ${game.rating}</span>
             <button class="btn-play-card ${isEnabled ? '' : 'btn-disabled'}" ${isEnabled ? '' : 'disabled'} data-play-id="${game.id}">
-              ${isEnabled ? 'Play 3D' : 'Offline'}
+              ${isEnabled ? 'Play' : 'Offline'}
             </button>
           </div>
         </div>
@@ -524,7 +524,7 @@ function launchGame(game) {
   const bestScore = appState.highScores[game.id] || 0;
 
   if (titleEl) titleEl.innerText = game.title;
-  if (badgeEl) badgeEl.innerText = (game.category || '3D CYBER').toUpperCase();
+  if (badgeEl) badgeEl.innerText = (game.category || 'CYBER').toUpperCase();
   if (pauseGameName) pauseGameName.innerText = game.title;
 
   if (hudScore) hudScore.innerText = '0';
@@ -785,8 +785,8 @@ function initChatSystem() {
   setInterval(() => {
     const liveNames = ['Matrix_Hero', 'NeonGhost', 'PixelPhantom', 'ZeroPulse', 'ViperQueen'];
     const liveTexts = [
-      'Just broke 45,000 points in Cyber Runner 3D! 🏆',
-      'The 3D space blaster laser sound is super crisp!',
+      'Just broke 45,000 points in Cyber Runner! 🏆',
+      'The space blaster laser sound is super crisp!',
       'Server ping is under 15ms today, super smooth.',
       'Just unlocked the holographic neon badge!'
     ];
@@ -898,7 +898,7 @@ function initApkModal() {
         const { outcome } = await deferredPrompt.userChoice;
         if (outcome === 'accepted') {
           confetti({ particleCount: 100 });
-          alert('Nexus 3D App successfully installed to your device!');
+          alert('Nexus App successfully installed to your device!');
         }
         deferredPrompt = null;
       } else {

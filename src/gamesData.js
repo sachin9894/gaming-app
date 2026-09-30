@@ -1,27 +1,27 @@
-// 20 Futuristic 3D Games Configuration Database with Real Cover Artworks
+// 20 Futuristic Games Configuration Database with Real Cover Artworks
 export const INITIAL_GAMES = [
   {
     id: 'cyber-runner-3d',
     title: 'Cyber Runner: Pulse',
     category: 'action',
-    badge: '3D HIGHWAY',
+    badge: 'HIGHWAY',
     image: '/cover-runner.jpg',
     color: '#00f3ff',
     plays: '142.8K',
     rating: '4.9',
-    description: 'High-speed 3D infinite runner on a neon cyber freeway. Dodge quantum barriers, jump across cyber grids, and harvest energy cores.',
+    description: 'High-speed infinite runner on a neon cyber freeway. Dodge quantum barriers, jump across cyber grids, and harvest energy cores.',
     controls: 'Arrow Left/Right (or A/D) to steer, Up/Space to Jump, Touch arrows on Mobile',
     playableType: 'threejs-runner',
     difficulty: 'Extreme Speed',
     featured: true,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'space-blaster-3d',
-    title: 'Galactic Fury: Starfighter 3D',
+    title: 'Galactic Fury: Starfighter',
     category: 'shooter',
-    badge: '3D COCKPIT',
+    badge: 'COCKPIT',
     image: '/cover-space.jpg',
     color: '#9d00ff',
     plays: '112.1K',
@@ -32,28 +32,28 @@ export const INITIAL_GAMES = [
     difficulty: 'Pro Pilot',
     featured: true,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'neon-tunnel-3d',
-    title: 'Neon Tunnel: Warp Speed 3D',
+    title: 'Neon Tunnel: Warp Speed',
     category: 'racing',
     badge: 'HYPERSPACE',
     image: '/cover-tunnel.jpg',
     color: '#ff007f',
     plays: '98.4K',
     rating: '4.8',
-    description: 'Dive into a spiraling hyperspace 3D vortex. Rotate your craft 360° along the tunnel circumference to evade laser barriers at lightspeed.',
+    description: 'Dive into a spiraling hyperspace vortex. Rotate your craft 360° along the tunnel circumference to evade laser barriers at lightspeed.',
     controls: 'Arrow Left/Right (or A/D) to rotate tunnel, Space for nitro hyper-boost',
     playableType: 'threejs-tunnel',
     difficulty: 'Lightspeed',
     featured: true,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'mecha-brawl-arena',
-    title: 'Cyber Mech Arena 3D',
+    title: 'Cyber Mech Arena',
     category: 'action',
     badge: 'TITAN BRAWL',
     image: '/cover-mecha.jpg',
@@ -66,13 +66,13 @@ export const INITIAL_GAMES = [
     difficulty: 'Hardcore',
     featured: true,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'cyber-pong-3d',
-    title: 'Holo-Pong Quantum 3D',
+    title: 'Holo-Pong Quantum',
     category: 'action',
-    badge: '3D HOCKEY',
+    badge: 'HOCKEY',
     image: '/app-icon.jpg',
     color: '#00ffaa',
     plays: '85.2K',
@@ -83,28 +83,28 @@ export const INITIAL_GAMES = [
     difficulty: 'Adaptive AI',
     featured: false,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'quantum-matrix-breaker',
-    title: 'Quantum Matrix Breaker 3D',
+    title: 'Quantum Matrix Breaker',
     category: 'puzzle',
-    badge: '3D MATRIX',
+    badge: 'MATRIX',
     image: '/cover-tunnel.jpg',
     color: '#ffe600',
     plays: '74.5K',
     rating: '4.8',
-    description: '3D neon isometric brick breaker with multi-ball antimatter powerups and exploding crystalline cyber nodes.',
+    description: 'Neon isometric brick breaker with multi-ball antimatter powerups and exploding crystalline cyber nodes.',
     controls: 'Move paddle left/right, Space/Tap to launch antimatter ball',
     playableType: 'interactive-arena',
     difficulty: 'Medium',
     featured: false,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'hover-drift-3d',
-    title: 'Hover Drift Neo-Tokyo 3D',
+    title: 'Hover Drift Neo-Tokyo',
     category: 'racing',
     badge: 'SKY RACING',
     image: '/hero-banner.jpg',
@@ -117,7 +117,7 @@ export const INITIAL_GAMES = [
     difficulty: 'Extreme',
     featured: false,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'holo-sniper-3d',
@@ -134,11 +134,11 @@ export const INITIAL_GAMES = [
     difficulty: 'Precision',
     featured: false,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'gravity-flip-3d',
-    title: 'Gravity Flip: Lab 3D',
+    title: 'Gravity Flip: Lab',
     category: 'action',
     badge: 'ZERO-G',
     image: '/cover-runner.jpg',
@@ -151,13 +151,13 @@ export const INITIAL_GAMES = [
     difficulty: 'Reflex',
     featured: false,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'laser-maze-escape',
     title: 'Laser Maze: Cyber Infiltration',
     category: 'puzzle',
-    badge: 'STEALTH 3D',
+    badge: 'STEALTH',
     image: '/hero-banner.jpg',
     color: '#ef4444',
     plays: '52.7K',
@@ -168,11 +168,11 @@ export const INITIAL_GAMES = [
     difficulty: 'Tactical',
     featured: false,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'cyber-snake-3d',
-    title: 'Tron Light-Trail 3D',
+    title: 'Tron Light-Trail',
     category: 'action',
     badge: 'CYBER GRID',
     image: '/cover-tunnel.jpg',
@@ -185,11 +185,11 @@ export const INITIAL_GAMES = [
     difficulty: 'Arcade Classic',
     featured: false,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'matrix-memory-grid-3d',
-    title: 'Matrix Neural Hacker 3D',
+    title: 'Matrix Neural Hacker',
     category: 'puzzle',
     badge: 'MIND MATRIX',
     image: '/app-icon.jpg',
@@ -202,11 +202,11 @@ export const INITIAL_GAMES = [
     difficulty: 'Brain Hacker',
     featured: false,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'galactic-defense-tower',
-    title: 'Galactic Base Defender 3D',
+    title: 'Galactic Base Defender',
     category: 'puzzle',
     badge: 'TOWER DEFENSE',
     image: '/cover-space.jpg',
@@ -219,13 +219,13 @@ export const INITIAL_GAMES = [
     difficulty: 'Strategy',
     featured: false,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'neon-helix-drop-3d',
-    title: 'Neon Helix Drop 3D',
+    title: 'Neon Helix Drop',
     category: 'action',
-    badge: 'HELIX 3D',
+    badge: 'HELIX',
     image: '/cover-tunnel.jpg',
     color: '#ec4899',
     plays: '89.4K',
@@ -236,11 +236,11 @@ export const INITIAL_GAMES = [
     difficulty: 'Addictive',
     featured: false,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'quantum-flappy-drone',
-    title: 'Cyber Drone Strike 3D',
+    title: 'Cyber Drone Strike',
     category: 'action',
     badge: 'DRONE PILOT',
     image: '/hero-banner.jpg',
@@ -253,11 +253,11 @@ export const INITIAL_GAMES = [
     difficulty: 'Hardcore',
     featured: false,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'cyber-blade-dash',
-    title: 'Cyber Blade Katana 3D',
+    title: 'Cyber Blade Katana',
     category: 'action',
     badge: 'SYNTH SLICE',
     image: '/cover-mecha.jpg',
@@ -270,11 +270,11 @@ export const INITIAL_GAMES = [
     difficulty: 'Rhythm Slice',
     featured: false,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'zero-g-space-lander',
-    title: 'Zero-G Orbital Lander 3D',
+    title: 'Zero-G Orbital Lander',
     category: 'puzzle',
     badge: 'SPACE SIM',
     image: '/cover-space.jpg',
@@ -287,11 +287,11 @@ export const INITIAL_GAMES = [
     difficulty: 'Physics Master',
     featured: false,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'bio-dome-survival-3d',
-    title: 'Bio-Dome Alien Outpost 3D',
+    title: 'Bio-Dome Alien Outpost',
     category: 'shooter',
     badge: 'OUTPOST SURVIVAL',
     image: '/cover-mecha.jpg',
@@ -304,11 +304,11 @@ export const INITIAL_GAMES = [
     difficulty: 'Wave Survival',
     featured: false,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'hyper-bowling-3d',
-    title: 'Hyper Plasma Bowling 3D',
+    title: 'Hyper Plasma Bowling',
     category: 'action',
     badge: 'COSMIC SPORTS',
     image: '/cover-runner.jpg',
@@ -321,11 +321,11 @@ export const INITIAL_GAMES = [
     difficulty: 'Casual Fun',
     featured: false,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   },
   {
     id: 'portal-jumper-3d',
-    title: 'Quantum Portal Jumper 3D',
+    title: 'Quantum Portal Jumper',
     category: 'puzzle',
     badge: 'DIMENSION PORTAL',
     image: '/hero-banner.jpg',
@@ -338,7 +338,7 @@ export const INITIAL_GAMES = [
     difficulty: 'Mind Bender',
     featured: false,
     enabled: true,
-    fps: '60 FPS 3D'
+    fps: '60 FPS'
   }
 ];
 
@@ -355,6 +355,6 @@ export const INITIAL_LEADERBOARD = [
 export const INITIAL_CHAT = [
   { user: 'Valkyrie_9', text: 'Anyone up for Cyber Runner highscore challenge?', time: 'Just now', color: '#00f3ff' },
   { user: 'KiroShi_Tech', text: 'Neon Tunnel level 15 speed is insane!! 🤯', time: '1m ago', color: '#ff007f' },
-  { user: 'Nova_Blast', text: 'Space Asteroid Blaster has awesome 3D physics!', time: '2m ago', color: '#ffe600' },
+  { user: 'Nova_Blast', text: 'Space Asteroid Blaster has awesome physics!', time: '2m ago', color: '#ffe600' },
   { user: 'GlitchMaster', text: 'Claimed my 500 Cyber Coins from daily quest 😎', time: '3m ago', color: '#00ffaa' }
 ];

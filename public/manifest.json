@@ -1,7 +1,7 @@
 {
-  "name": "NEXUS 3D - Futuristic Cyber Gaming Hub",
-  "short_name": "NEXUS 3D",
-  "description": "Futuristic 3D Web & Mobile Gaming Platform with 20 Cyber Games, Leaderboards & Online Arena",
+  "name": "NEXUS - Futuristic Cyber Gaming Hub",
+  "short_name": "NEXUS",
+  "description": "Futuristic Web & Mobile Gaming Platform with 20 Cyber Games, Leaderboards & Online Arena",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "any",

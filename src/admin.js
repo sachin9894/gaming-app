@@ -253,18 +253,18 @@ export class AdminControlPanel {
       id: 'custom-' + Date.now(),
       title: titleInput.value.trim(),
       category: catInput ? catInput.value : 'action',
-      badge: 'NEW 3D',
+      badge: 'NEW',
       icon: iconInput && iconInput.value ? iconInput.value : '🎮',
       color: '#00f3ff',
       plays: '0',
       rating: '5.0',
-      description: descInput && descInput.value ? descInput.value : 'Newly added futuristic 3D game.',
+      description: descInput && descInput.value ? descInput.value : 'Newly added futuristic game.',
       controls: 'Keyboard & Touch responsive',
       playableType: 'simulation',
       difficulty: 'Medium',
       featured: true,
       enabled: true,
-      fps: '60 FPS 3D'
+      fps: '60 FPS'
     };
 
     this.appState.games.unshift(newGame);
